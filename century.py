@@ -16,7 +16,6 @@
 # - create area for playable cards
 # - create area for player1 hand
 # - fill mentioned areas with cards 
-# - create area for last played card
 # - create history area which contain description of last few actions
 # - display current turn
 # - display storage of all players
@@ -33,8 +32,8 @@ import random
 from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from modules.Ui import Ui
-from modules.Game import Game
+from modules.view.Ui import Ui
+from modules.model.Game import Game
 
 
 #Create Game Object

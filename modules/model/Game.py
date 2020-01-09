@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
-from modules.Deck import Deck
-from modules.Player import Player
+from modules.controller.Deck import Deck
+from modules.model.Player import Player
 import sys
 
 class Game:
@@ -14,8 +14,11 @@ class Game:
         else:
             #Create Players
             self.players = list()
-            for x in range (0, 2):
+            for x in range (0, 4):
                 self.players.append(Player(name=f'player{x+1}', no=x)) #It could be any names but for now we're creating players 1, 2 etc
+
+            #Define when game will end
+            self.riches_maximum = 9
 
             #Create Deck of playable cards based on source_filefile. Cards are not objects yet
             self.DeckPlayable = Deck(source_file='playable')

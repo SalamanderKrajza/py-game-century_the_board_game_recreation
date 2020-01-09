@@ -1,6 +1,6 @@
 import csv
 import random
-from modules.Card import Card
+from modules.model.Card import Card
 
 class Deck:
     """Class which contains CARDS objects and allows to operate on that objects"""
@@ -12,7 +12,7 @@ class Deck:
 
 
     def load_cards(self, source_file):
-        path = f'modules/cards{source_file}.csv'
+        path = f'externaldata/cards{source_file}.csv'
 
         with open(path, newline='') as csvfile:
             self.cards = list(csv.reader(csvfile, delimiter=';')) #I've removed "quotechar='|'" 
