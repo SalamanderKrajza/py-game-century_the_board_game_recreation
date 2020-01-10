@@ -1,8 +1,31 @@
 
 from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
-from functools import partial
-def display_card(self, card, target):
+from modules.view.img import img
+
+from PyQt5.QtWidgets import QStyleOption, QStyle
+from PyQt5.QtGui import QPainter
+
+
+
+class CardWidget(QtWidgets.QWidget):
+    """We want to let card widget hold some additional variables about itself"""
+    def __init__(self, card, parent = None):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.card = card
+
+    def paintEvent(self, event):
+        #Subclasses from QWidget loses their ability to use StyleSheets
+        #In order to use the StyleSheets you need to provide a paintEvent to the custom widget.
+        #This part of code is based on https://stackoverflow.com/questions/2565963/pyqt4-qwidget-subclass-not-responding-to-new-setstylesheet-background-colour
+        opt = QStyleOption()
+        #opt.init(self)
+        opt.initFrom(self)
+        painter = QPainter(self)
+        self.style().drawPrimitive(QStyle.PE_Widget, opt, painter, self)
+
+
+def display_card(self, card, Target):
     """Defines how and where given card should be displayed"""
     used = card.used
     card_type = card.card_type
@@ -33,18 +56,19 @@ def display_card(self, card, target):
     }
 
     #CB is space for card and area below reserved for buttons/additional dies/additional money
-    self.Whole_Widget = QtWidgets.QWidget()
-    self.Whole_Widget.setObjectName("Whole_Widget") #Needed to configure styleSheet
-    self.Whole_Widget.resize(120, 200) #This dimenshion describe both, card and buttons below it
+    self.WholeWidget = QtWidgets.QWidget()
+    self.WholeWidget.setObjectName("WholeWidget") #Needed to configure styleSheet
+    self.WholeWidget.resize(120, 200) #This dimenshion describe both, card and buttons below it
 
-    #Inside this container we have WholeLayout which separates card and stuff from below into 2 elements
-    self.Whole_VerticalLayout = QtWidgets.QVBoxLayout(self.Whole_Widget)
-    self.Whole_VerticalLayout.setSpacing(0)
-    self.Whole_VerticalLayout.setContentsMargins(0,0,0,0)
+    #Inside this container we have WholeLayout which separates card and stuff from below into 2 Elements
+    self.WholeVerticalLayout = QtWidgets.QVBoxLayout(self.WholeWidget)
+    self.WholeVerticalLayout.setSpacing(0)
+    self.WholeVerticalLayout.setContentsMargins(0,0,0,0)
 
 
     #Create card widget
-    self.CardWidget = QtWidgets.QWidget()
+    #self.CardWidget = QtWidgets.QWidget()
+    self.CardWidget = CardWidget(card)
     self.CardWidget.setFixedSize(120, 160)
     self.CardWidget.setObjectName("CardWidget")
     self.CardWidget.setStyleSheet(
@@ -60,77 +84,113 @@ def display_card(self, card, target):
     self.CardGrid.setVerticalSpacing(2)
 
     #Fill the card grid basing on card_type
-    self.fill_grid(the_list, descriptions, card_type)
+    self.fill_grid(the_list, descriptions, card_type, card.points)
 
     #Add CardWidget to Whole_Vertical layout which contains card and buttons/extra content
-    self.Whole_VerticalLayout.addWidget(self.CardWidget)
+    self.WholeVerticalLayout.addWidget(self.CardWidget)
 
-    ###################################################################################
-    #
-    #Replacing mouseRelaseEvent with my function. 
-    #it's a little weird because event is not triggering while click on description
-    #but works while clicking on something else
+    #add anything below cards. It will be replaced later
+    self.BelowCardWidget = QtWidgets.QWidget()
+    self.BelowCardWidget.setFixedHeight(40)
+    self.BelowCardWidget.setStyleSheet('*{background-color: pink}')
+    self.WholeVerticalLayout.addWidget(self.BelowCardWidget)
     
-    #print(self.Whole_Widget)
-    self.CardWidget.mouseReleaseEvent=partial(self.take_card, target, self.Whole_Widget)
-    #
-    ###################################################################################
+    #Add WholeWidget to Target layout in the Game window
+    Target.addWidget(self.WholeWidget)
+    #print(Target.indexOf(self.WholeWidget))
     
-    #Add Whole_Widget to target layout in the Game window
-    target.addWidget(self.Whole_Widget)
-    print(target.indexOf(self.Whole_Widget))
-    
-def fill_grid(self, the_list, descriptions, card_type):
+def fill_grid(self, the_list, descriptions, card_type, points):
         if card_type == 'Trade' or card_type == 'Harvest':
             for row in range (0, 5):
                 for column in range (0,2):
                     #Add all inputs and outputs to the grid
-                    element = QtWidgets.QLabel()
-                    element.setText = ""
+                    Element = QtWidgets.QLabel()
+                    Element.setText = ""
                     if the_list[column][row] != "":
-                        element.setStyleSheet(
+                        Element.setStyleSheet(
                             f"background-image: url(images/{the_list[column][row]}.png);"
                             "background-repeat: none; "
                             "background-position: center;"
                             )
-                    self.CardGrid.addWidget(element, row, column)
+                    self.CardGrid.addWidget(Element, row, column)
 
             #Add description
-            self.description = QLabel(descriptions[card_type])
+            self.Description = QLabel(descriptions[card_type])
             #description.setTextFormat(QtCore.Qt.RichText) #In my version of python this line is no needed (it detects html automatically)
-            self.description.setWordWrap(True)
-            self.description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-            self.description.setObjectName("description")
-            self.description.setFixedHeight(60)
-            self.description.setStyleSheet("*{font-size:10px; padding-top: 11px;}")
-            self.CardGrid.addWidget(self.description, 7, 0, 1, 2) #row, column, how many rows, how many columns
+            self.Description.setWordWrap(True)
+            self.Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+            self.Description.setObjectName("description")
+            self.Description.setFixedHeight(60)
+            self.Description.setStyleSheet("*{font-size:10px; padding-top: 11px;}")
+            self.CardGrid.addWidget(self.Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
 
         if card_type == 'Upgrade':
-            #add first input to two first fields in the grid
-            element = QtWidgets.QLabel()
-            element.setText = ""
-            element.setStyleSheet(
-                f"background-image: url(images/{the_list[0][0]}.png);"
-                "background-repeat: none; "
-                "background-position: center;"
+            #Upgrade cards displays only number which defines amout of dies to upgrade and image of gray die
+            self.UpgradeCardHorizotalLayout = QtWidgets.QHBoxLayout()
+            self.CardGrid.addLayout(self.UpgradeCardHorizotalLayout, 0, 0, 2, 1)
+
+            #Display the number
+            Element = QtWidgets.QLabel()
+            Element.setFixedSize(20, 20)
+            Element.setText(f'{the_list[0][0]}')
+            Element.setStyleSheet(
+                "font-size:12px; font-weight: bold;"
+                "padding-left: 5px;"
                 )
-            self.CardGrid.addWidget(element, 0, 0, 2, 1)
+            self.UpgradeCardHorizotalLayout.addWidget(Element)
 
-            #Fill the grid with empty labels
-            for row in range (0, 5):
-                for column in range (0,2):
-                    if row <=1 and column == 0: continue
-                    element = QtWidgets.QLabel()
-                    element.setText = ""
+            #Display the image of gray die
+            Element = QtWidgets.QLabel()
+            Element.setText('')
+            Element.setStyleSheet(
+                f"background-image: url(images/k5.png);"
+                "background-repeat: none; "
+                "margin-top: 3px"
+            )
+            self.UpgradeCardHorizotalLayout.addWidget(Element)
 
-                    self.CardGrid.addWidget(element, row, column)
+            #Then we need empty label to separate first Element from description
+            Element = QtWidgets.QLabel()
+            Element.setFixedHeight(80)
+            self.CardGrid.addWidget(Element)
 
-            #Add description
-            self.description = QLabel(descriptions[card_type])
+
+            #And finally we'rea dding description
+            self.Description = QLabel(descriptions[card_type])
             #description.setTextFormat(QtCore.Qt.RichText) #In my version of python this line is no needed (it detects html automatically)
-            self.description.setWordWrap(True)
-            self.description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-            self.description.setObjectName("description")
-            self.description.setFixedHeight(60)
-            self.description.setStyleSheet("*{font-size:10px; padding-top: 11px;}")
-            self.CardGrid.addWidget(self.description, 7, 0, 1, 2) #row, column, how many rows, how many columns
+            self.Description.setWordWrap(True)
+            self.Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+            self.Description.setObjectName("description")
+            self.Description.setFixedHeight(45)
+            self.Description.setStyleSheet("font-size:10px")
+            self.CardGrid.addWidget(self.Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
+
+
+        if card_type == 'Treasure':
+            #Treasure cards displays amount of points they're giving to their owner
+            Element = QtWidgets.QLabel()
+            Element.setFixedWidth(35)
+            Element.setText(f'{points}')
+            Element.setStyleSheet(
+                "font-size:12px; font-weight: bold;"
+                "padding-left: 8px;"
+                )
+            self.CardGrid.addWidget(Element, 0, 0)
+
+            #Then we need empty label to separate first Element from description
+            Element = QtWidgets.QLabel()
+            Element.setFixedSize(105, 90)
+            self.CardGrid.addWidget(Element, 1, 0)
+            self.CardGrid.setHorizontalSpacing(1)
+            
+            for x in range(0, 6):
+                Element = QtWidgets.QLabel('')
+                Element.setFixedWidth(16)
+                Element.setObjectName("bigger_labels")
+                if the_list[0][x]!='':
+                    Element.setStyleSheet(
+                        f"background-image: url(images/{the_list[0][x]}.png);"
+                        "background-repeat: none; "
+                        "background-position: center;"
+                    )
+                self.CardGrid.addWidget(Element, 2, x)

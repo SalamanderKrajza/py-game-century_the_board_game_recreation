@@ -3,6 +3,7 @@ from modules.controller.Deck import Deck
 from modules.model.Player import Player
 import sys
 
+
 class Game:
     """Class which contains objects and variables needed to making game working"""
     def __init__(self, new_game=True):
@@ -40,5 +41,6 @@ class Game:
 
             #Create variable which monitor current player
             self.current_player_no = self.players[0].no
+            self.current_player = self.players[0]
 
 

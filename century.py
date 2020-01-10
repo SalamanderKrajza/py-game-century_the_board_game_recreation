@@ -23,7 +23,21 @@
 
 
 #III. Control the game (add methods for UI interface), check win conditions etc
-
+# - monitore which player turn is now
+# - monitore if someone win the game
+# - buying riches cards
+# - buying playable cards
+# - playing upgrade card
+# - playing harvest card
+# - playing trade card
+# - additional actions on cards in player hand
+#       - moving them
+# - additional bonuses on riches cards in store
+#       - show coins, get coins
+# - additional bonuses on palayable cards in store
+#       - show extra dies to get
+# - system for drawing extre dies
+# - system for
 
 
 
@@ -34,6 +48,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from modules.view.Ui import Ui
 from modules.model.Game import Game
+from modules.controller.Controller import Controller
 
 
 #Create Game Object
@@ -41,8 +56,12 @@ MyGame = Game(new_game=True)
 
 
 #Configure and show UI
-app = QtWidgets.QApplication(sys.argv) 
-myUi = Ui(MyGame)
-sys.exit(app.exec_())
+App = QtWidgets.QApplication(sys.argv) 
+MyUi = Ui(MyGame)
+
+#Control the game
+MyController = Controller(MyGame, MyUi)
+
+sys.exit(App.exec_())
 
 

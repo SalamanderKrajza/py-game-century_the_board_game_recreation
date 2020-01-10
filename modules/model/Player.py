@@ -17,14 +17,14 @@ class Player():
         self.coins_points = 0
 
         #Create PlayerHand
-        self.playerHand = list()
+        self.player_hand = list()
 
         #Pick starter cards
-        self.playerHand.append(Card(card_type='Harvest', \
+        self.player_hand.append(Card(card_type='Harvest', \
             inputList=['k1', 'k1', '', '', ''], \
                 outputList=['', '', '', '', ''], \
                     used=False, owner=self.name))
-        self.playerHand.append(Card(card_type='Upgrade', \
+        self.player_hand.append(Card(card_type='Upgrade', \
             inputList=['2', '', '', '', ''], \
                 outputList=['', '', '', '', ''], \
                     used=False, owner=self.name))
