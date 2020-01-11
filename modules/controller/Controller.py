@@ -2,7 +2,7 @@ import sys
 from functools import partial
 from modules.controller.add_to_history import add_to_history
 from modules.controller.take_card import *
-
+from modules.view.Popup import *
 
 class Controller:
     def __init__(self, Game, Ui):
@@ -21,6 +21,7 @@ class Controller:
         # #Add onclick event to buyable cards in stole  
         for x in range(0, Ui.buyableStore.HorizontalLayout.count()):
             self.buyable_controller(card_number=x)
+
 
     def _check_refferences(self, WholeWidget, CardWidget):
         #Check if refferences are correct

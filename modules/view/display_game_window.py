@@ -12,6 +12,4 @@ def display_game_window(self):
         #"#test{border: 1px solid #F00}" 
         "#MyGame_Screen{background-image: url(images/board2.png)}"
         #"#MyGame_Screen{background-color: #b38b79"
-        "#ScrollArea{background-color: #b38b79; border: 1px solid black}"
-        "#ScrollAreaWidgetContents{background-color: #b38b79; }"
         )

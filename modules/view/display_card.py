@@ -10,9 +10,9 @@ from PyQt5.QtGui import QPainter
 
 class CardWidget(QtWidgets.QWidget):
     """We want to let card widget hold some additional variables about itself"""
-    def __init__(self, card, parent = None):
+    def __init__(self, Card, parent = None):
         QtWidgets.QWidget.__init__(self, parent)
-        self.card = card
+        self.Card = Card
 
     def paintEvent(self, event):
         #Subclasses from QWidget loses their ability to use StyleSheets
@@ -25,35 +25,11 @@ class CardWidget(QtWidgets.QWidget):
         self.style().drawPrimitive(QStyle.PE_Widget, opt, painter, self)
 
 
-def display_card(self, card, Target):
+def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     """Defines how and where given card should be displayed"""
-    used = card.used
-    card_type = card.card_type
-    the_list = card.the_list
-    
-    #define bacground based on card card_type
-    bg_images = {"Trade":"tradecard", "Upgrade":"upgradecard", "Harvest":"harvestcard", "Treasure":"treasurecard"}
-
-    tooltips = {"Trade":"<u><b>Card description</b></u><br>\
-        Replaces dies from left side of the card by dies from the right side<br><br> \
-        Can be used multiple time (if player have enough dies)",
-        "Upgrade":"<u><b>Card description</b></u><br>\
-        Upgrades specific amount of dies according to rules displayed on the card)",
-        "Harvest":"<u><b>Card description</b></u><br>\
-        Produces dies when played",
-        "Treasure":"<u><b>Card description</b></u><br>\
-        You can buy it to get the score",
-    }
-        
-
-    descriptions = {"Trade":"<u><b>Card description</b></u><br>\
-        Replaces left dies with right dies",
-        "Upgrade":"<u><b>Card description</b></u><br>\
-        Upgrades specific amount of dies",
-        "Harvest":"<u><b>Card description</b></u><br>\
-        Produces dies when played",
-        "Treasure":""
-    }
+    used = Card.used
+    card_type = Card.card_type
+    the_list = Card.the_list
 
     #CB is space for card and area below reserved for buttons/additional dies/additional money
     self.WholeWidget = QtWidgets.QWidget()
@@ -65,10 +41,37 @@ def display_card(self, card, Target):
     self.WholeVerticalLayout.setSpacing(0)
     self.WholeVerticalLayout.setContentsMargins(0,0,0,0)
 
+    #CardWidgetPart
+    #define bacground based on card card_type
+    bg_images = {
+        "Trade":"tradecard", 
+        "Upgrade":"upgradecard", 
+        "Harvest":"harvestcard", 
+        "Treasure":"treasurecard"}
+    tooltips = {
+        "Trade":"<u><b>Card description</b></u><br>\
+        Replaces dies from left side of the card by dies from the right side<br><br> \
+        Can be used multiple time (if player have enough dies)",
+        "Upgrade":"<u><b>Card description</b></u><br>\
+        Upgrades specific amount of dies according to rules displayed on the card)",
+        "Harvest":"<u><b>Card description</b></u><br>\
+        Produces dies when played",
+        "Treasure":"<u><b>Card description</b></u><br>\
+        You can buy it to get the score",
+    }
+    descriptions = {
+        "Trade":"<u><b>Card description</b></u><br>\
+        Replaces left dies with right dies",
+        "Upgrade":"<u><b>Card description</b></u><br>\
+        Upgrades specific amount of dies",
+        "Harvest":"<u><b>Card description</b></u><br>\
+        Produces dies when played",
+        "Treasure":""
+    }
 
-    #Create card widget
+    #Create CardWidget
     #self.CardWidget = QtWidgets.QWidget()
-    self.CardWidget = CardWidget(card)
+    self.CardWidget = CardWidget(Card)
     self.CardWidget.setFixedSize(120, 160)
     self.CardWidget.setObjectName("CardWidget")
     self.CardWidget.setStyleSheet(
@@ -84,10 +87,19 @@ def display_card(self, card, Target):
     self.CardGrid.setVerticalSpacing(2)
 
     #Fill the card grid basing on card_type
-    self.fill_grid(the_list, descriptions, card_type, card.points)
+    self.fill_grid(the_list, descriptions, card_type, Card.points)
 
-    #Add CardWidget to Whole_Vertical layout which contains card and buttons/extra content
+    #Add CardWidget to Whole_Vertical layout
     self.WholeVerticalLayout.addWidget(self.CardWidget)
+
+
+    #Add WholeWidget to Target layout in the Game window
+    Target.insertWidget(position_in_layout, self.WholeWidget) #inwsert widget replaces addWidget due to its position argument
+
+    #After card is created we're adding some space below for buttons/extre content
+    #However, in case we're creating this card for popup, we dont need this!
+    if for_popup==True:
+        return self.WholeWidget
 
     #add anything below cards. It will be replaced later
     self.BelowCardWidget = QtWidgets.QWidget()
@@ -95,9 +107,7 @@ def display_card(self, card, Target):
     self.BelowCardWidget.setStyleSheet('*{background-color: pink}')
     self.WholeVerticalLayout.addWidget(self.BelowCardWidget)
     
-    #Add WholeWidget to Target layout in the Game window
-    Target.addWidget(self.WholeWidget)
-    #print(Target.indexOf(self.WholeWidget))
+
     
 def fill_grid(self, the_list, descriptions, card_type, points):
         if card_type == 'Trade' or card_type == 'Harvest':

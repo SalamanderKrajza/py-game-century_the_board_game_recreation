@@ -7,6 +7,7 @@ import datetime
 from modules.view.ScrollBox import ScrollBox
 from modules.view.img import img
 from modules.controller.add_to_history import add_to_history
+from modules.view.Popup import Popup
 
 
 class Ui:
@@ -17,6 +18,7 @@ class Ui:
     from modules.view.add_text_label import add_text_label
     from modules.view.player_box import player_box
 
+
     def __init__(self, Game):
         pass
         self.Game = Game
@@ -25,7 +27,7 @@ class Ui:
         self.display_game_window()
 
         #Show players boxes
-        self.player_box(player=self.Game.players[0] ,x_pos=10, y_pos=600)
+        self.player_box(Player=self.Game.players[0] ,x_pos=10, y_pos=600)
 
         for x in Game.players:
             try:
@@ -38,24 +40,24 @@ class Ui:
         #Prepare space to contain cards
         #playable
         self.buyableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=5, \
-            x_pos=700, y_pos=150, height=200)
+            x_pos=700, y_pos=150, height=200, prefix='buyableStore')
         #buyable
         self.playableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=6, \
-            x_pos=570, y_pos=355, height=200)
+            x_pos=570, y_pos=355, height=200, prefix='playableStore')
         #player hand
         self.PlayerHand = ScrollBox(parentWidget=self.Screen, cards_cnt=8, \
-            x_pos=300, y_pos=570, height=220)
+            x_pos=300, y_pos=570, height=220, prefix='playerHand')
 
         #Display cards in storages        
-        for card in Game.playable_store_cards:
-            self.display_card(card=card, Target=self.playableStore.HorizontalLayout)
+        for Card in Game.playable_store_cards:
+            self.display_card(Card=Card, Target=self.playableStore.HorizontalLayout)
 
-        for card in Game.buyable_store_cards:
-            self.display_card(card=card, Target=self.buyableStore.HorizontalLayout)
+        for Card in Game.buyable_store_cards:
+            self.display_card(Card=Card, Target=self.buyableStore.HorizontalLayout)
 
         #Display cards in player hand
-        for card in Game.players[0].player_hand:
-            self.display_card(card=card, Target=self.PlayerHand.HorizontalLayout)
+        for Card in Game.players[0].player_hand:
+            self.display_card(Card=Card, Target=self.PlayerHand.HorizontalLayout)
         #Resize playerhand scrollbox (this have not fixed size)
         self.PlayerHand.ScrollAreaWidgetContents.resize(130*len(Game.players[0].player_hand), self.PlayerHand.ScrollAreaWidgetContents.height())
 
@@ -66,7 +68,7 @@ class Ui:
         #Display history box
         self.add_text_label(content='History:', x_pos=10, y_pos=125)
         self.history = ScrollBox(parentWidget=self.Screen, cards_cnt=4, \
-            x_pos=10, y_pos=150, height=370, scrollbox_type='history')
+            x_pos=10, y_pos=150, height=370, scrollbox_type='history', prefix='history')
         self.history.ScrollAreaWidgetContents.resize(self.history.ScrollAreaWidgetContents.width(), 20)
 
         #Filling the history with something for tests
@@ -77,4 +79,7 @@ class Ui:
 
         #show screen
         self.Screen.show()
+
+        #Create Popup to comunicate with player after he pressed something
+        self.MyPopup = Popup(Game=self.Game, Screen=self.Screen)
 

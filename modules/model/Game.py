@@ -41,6 +41,6 @@ class Game:
 
             #Create variable which monitor current player
             self.current_player_no = self.players[0].no
-            self.current_player = self.players[0]
+            self.CurrentPlayer = self.players[0]
 
 
