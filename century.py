@@ -12,8 +12,8 @@
 #           - status (turn)
 
 #II. Create UI based on gameobjects
-# - create area for buyable cards
-# - create area for playable cards
+# - create area for Buyable cards
+# - create area for Playable cards
 # - create area for player1 hand
 # - fill mentioned areas with cards 
 # - create history area which contain description of last few actions
@@ -26,7 +26,7 @@
 # - monitore which player turn is now
 # - monitore if someone win the game
 # - buying riches cards
-# - buying playable cards
+# - buying Playable cards
 # - playing upgrade card
 # - playing harvest card
 # - playing trade card
@@ -49,7 +49,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from modules.view.Ui import Ui
 from modules.model.Game import Game
 from modules.controller.Controller import Controller
-
+from modules.view.Popup import Popup
 
 #Create Game Object
 MyGame = Game(new_game=True)
@@ -59,8 +59,11 @@ MyGame = Game(new_game=True)
 App = QtWidgets.QApplication(sys.argv) 
 MyUi = Ui(MyGame)
 
+#Create Popup to comunicate with player after he pressed something
+MyPopup = Popup(Game=MyGame, Ui=MyUi)
+
 #Control the game
-MyController = Controller(MyGame, MyUi)
+MyController = Controller(MyGame, MyUi, MyPopup)
 
 sys.exit(App.exec_())
 

@@ -3,10 +3,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from modules.view.display_card import display_card
 from modules.view.img import img
 
+from functools import partial
+
 class Popup:
 
-    def __init__(self, Screen, Game, x_pos = 480, y_pos = 200, width=480, height=310):
-        self.PopupWidget = QtWidgets.QWidget(Screen)
+    from modules.controller.action_confirmed import action_confirmed
+    def __init__(self, Ui, Game, x_pos = 480, y_pos = 200, width=480, height=310):
+        self.Game=Game
+        self.PopupWidget = QtWidgets.QWidget(Ui.Screen)
         self.PopupWidget.setGeometry(QtCore.QRect(x_pos, y_pos, width, height))
         self.PopupWidget.setObjectName('PopupWidget')
         self.PopupWidget.setStyleSheet(
@@ -42,6 +46,7 @@ class Popup:
         
         #For test we're adding some widget to simulate card image
         self.CardWidget = QtWidgets.QWidget()
+        self.CardWidget.setObjectName('CardWidgetTemplate')
         self.CardWidget.setFixedSize(120, 160)
         self.CardWidget.setStyleSheet(
                                     "background-color: #935b89; "
@@ -108,24 +113,26 @@ class Popup:
         self.Button4.setFixedSize(50, 50)
         self.HorizontalLayout2.addWidget(self.Button4)
 
-        #Assing methods to buttons
-        self.Button1.clicked.connect(self.confirm) 
-        self.Button2.clicked.connect(self.close_popup) 
 
     def close_popup(self):
         self.PopupWidget.hide()
 
-    def confirm(self):
-        #We assume that Button1 is invisible unless action is possible so we're not checking if player fulfill requirements here
-        if self.popup_type == 'Treasure':
-            pass
-
+    def test2(self):
+        print('test2')
 
     def display_popup(self):
         self.PopupWidget.show()
 
-    def configure_popup(self, popup_type, Card, Ui, Player):
+    def configure_popup(self, popup_type, CardWidget, Ui, Player):
         self.popup_type = popup_type
+
+        #Assing methods to buttons - We're assigning here (instead in __init__ because we're using Ui as argument)
+        self.Button1.disconnect()
+        #Quick Note: self.CardWidget is card inside popup, CardWidget is card which was clicked
+        self.Button1.clicked.connect(partial(self.action_confirmed, CardWidget.parent(), CardWidget, Ui, self.Game)) 
+        self.Button2.disconnect()
+        self.Button2.clicked.connect(self.close_popup) 
+
         #We start with hidding all right side widgets (so we can display desired for given popup_type)
         for x in self.right_side_widgets_list:
             x.hide()
@@ -138,17 +145,17 @@ class Popup:
         #We're also hidding Card on this widget because it might be not needed
         self.CardWidget.hide()
 
+        #Then we're going to check popup_type and display desired right_side_widgets
         checker=True #Variable to help determine which widgets should be shown 
 
-        #Then we're going to check popup_type and display desired right_side_widgets
-        #Treasure Card picking
-        if popup_type == 'Treasure':
+        #Buyable Card picking
+        if popup_type == 'Buyable':
             for x in [0,1,2,3,4,5,10]:
                 pass
                 self.right_side_widgets_list[x].show()
             for x in range(1,5):
-            #check if player have enough resources of every color to buy this Treasure Card
-                if Player.resources.count(f'k{x}') < Card.Card.the_list[0].count(f'k{x}'):
+            #check if player have enough resources of every color to buy this Buyable Card
+                if Player.resources.count(f'k{x}') < CardWidget.Card.the_list[0].count(f'k{x}'):
                     checker=False
             if checker:
                 self.right_side_widgets_list[10].hide()
@@ -157,7 +164,6 @@ class Popup:
                 self.right_side_widgets_list[4].hide()
                 self.right_side_widgets_list[5].hide()
                 self.Button1.hide()
-
 
         #Playable Card picking
         elif self.popup_type == 'Playable':
@@ -189,35 +195,40 @@ class Popup:
             #Delete old CardWidget inside PopupBox
             self.CardWidget.deleteLater()
 
+            #Quick Note:
             #This works good but i wasn't able to find way of copying widget (only moving this) so instead we generate a new one
             # self.CardWidget = Card
             # self.HorizontalLayout.insertWidget(0, self.CardWidget
 
             #Generate new card
-            self.CardWidget = Ui.display_card(Card=Card.Card, Target=self.HorizontalLayout, position_in_layout=0, for_popup=True)
+            self.CardWidget = Ui.display_card(Card=CardWidget.Card, Target=self.HorizontalLayout, position_in_layout=0, for_popup=True)
             self.CardWidget.setFixedSize(120, 160)
 
             #Looks like its not needed but i am leaving this line "just in case"
             self.CardWidget.show()
 
-        if Card.Card.bonus > 1:
+        if CardWidget.Card.bonus > 1:
             bonus = ' +1 Gold coin'
-        elif Card.Card.bonus == 1:
+        elif CardWidget.Card.bonus == 1:
             bonus = ' +1 Silver coin'
         else:
             bonus = ''
 
         #Then we should update labels
         maintext={
-                'Treasure':f'You are buying a Treasure Card{bonus}',
-                'Playable':'You are taking a Playable Card'
+                'Buyable':f'You are buying a Treasure Card{bonus}',
+                'Playable':'You are taking a Playable Card',
+                'Harvest':"You're playing Harvesting Card",
+                'Upgrade':"You're playing Trade card",
+                'Trade':"You're playing Trade card"
                 }
         self.MainText.setText(maintext[self.popup_type])
         
-        self.update_right_side_widgets(Player=Player, Card=Card)
-        
+        self.update_right_side_widgets(Player=Player, CardWidget=CardWidget)
+    
 
-    def update_right_side_widgets(self, Player, Card):
+
+    def update_right_side_widgets(self, Player, CardWidget):
         self.right_side_widgets_list[0].setText("You have:")
         self.right_side_widgets_list[1].setText(
             f'[ \
@@ -230,19 +241,21 @@ class Popup:
         self.right_side_widgets_list[2].setText("It costs:")
         self.right_side_widgets_list[3].setText(
             f'[ \
-            {Card.Card.the_list[0].count("k1")} {img(file_name="k1", width=14, height=16)}| \
-            {Card.Card.the_list[0].count("k2")} {img(file_name="k2", width=14, height=16)}| \
-            {Card.Card.the_list[0].count("k3")} {img(file_name="k3", width=14, height=16)}| \
-            {Card.Card.the_list[0].count("k4")} {img(file_name="k4", width=14, height=16)} \
+            {CardWidget.Card.the_list[0].count("k1")} {img(file_name="k1", width=14, height=16)}| \
+            {CardWidget.Card.the_list[0].count("k2")} {img(file_name="k2", width=14, height=16)}| \
+            {CardWidget.Card.the_list[0].count("k3")} {img(file_name="k3", width=14, height=16)}| \
+            {CardWidget.Card.the_list[0].count("k4")} {img(file_name="k4", width=14, height=16)} \
             ]')
 
         self.right_side_widgets_list[4].setText("You will have:")
         self.right_side_widgets_list[5].setText(
             f'[ \
-            {Player.resources.count("k1")-Card.Card.the_list[0].count("k1")} {img(file_name="k1", width=14, height=16)}| \
-            {Player.resources.count("k1")-Card.Card.the_list[0].count("k2")} {img(file_name="k2", width=14, height=16)}| \
-            {Player.resources.count("k1")-Card.Card.the_list[0].count("k3")} {img(file_name="k3", width=14, height=16)}| \
-            {Player.resources.count("k1")-Card.Card.the_list[0].count("k4")} {img(file_name="k4", width=14, height=16)} \
+            {Player.resources.count("k1")-CardWidget.Card.the_list[0].count("k1")} {img(file_name="k1", width=14, height=16)}| \
+            {Player.resources.count("k1")-CardWidget.Card.the_list[0].count("k2")} {img(file_name="k2", width=14, height=16)}| \
+            {Player.resources.count("k1")-CardWidget.Card.the_list[0].count("k3")} {img(file_name="k3", width=14, height=16)}| \
+            {Player.resources.count("k1")-CardWidget.Card.the_list[0].count("k4")} {img(file_name="k4", width=14, height=16)} \
             ]')
         self.right_side_widgets_list[10].setText('You have not enough resources!')
+        
+
         

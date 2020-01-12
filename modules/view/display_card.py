@@ -32,14 +32,14 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     the_list = Card.the_list
 
     #CB is space for card and area below reserved for buttons/additional dies/additional money
-    self.WholeWidget = QtWidgets.QWidget()
-    self.WholeWidget.setObjectName("WholeWidget") #Needed to configure styleSheet
-    self.WholeWidget.resize(120, 200) #This dimenshion describe both, card and buttons below it
+    WholeWidget = QtWidgets.QWidget()
+    WholeWidget.setObjectName("WholeWidget") #Needed to configure styleSheet
+    WholeWidget.resize(120, 200) #This dimenshion describe both, card and buttons below it
 
     #Inside this container we have WholeLayout which separates card and stuff from below into 2 Elements
-    self.WholeVerticalLayout = QtWidgets.QVBoxLayout(self.WholeWidget)
-    self.WholeVerticalLayout.setSpacing(0)
-    self.WholeVerticalLayout.setContentsMargins(0,0,0,0)
+    WholeVerticalLayout = QtWidgets.QVBoxLayout(WholeWidget)
+    WholeVerticalLayout.setSpacing(0)
+    WholeVerticalLayout.setContentsMargins(0,0,0,0)
 
     #CardWidgetPart
     #define bacground based on card card_type
@@ -70,46 +70,46 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     }
 
     #Create CardWidget
-    #self.CardWidget = QtWidgets.QWidget()
-    self.CardWidget = CardWidget(Card)
-    self.CardWidget.setFixedSize(120, 160)
-    self.CardWidget.setObjectName("CardWidget")
-    self.CardWidget.setStyleSheet(
+    #MyCardWidget = QtWidgets.QWidget()
+    MyCardWidget = CardWidget(Card)
+    MyCardWidget.setFixedSize(120, 160)
+    MyCardWidget.setObjectName("CardWidget")
+    MyCardWidget.setStyleSheet(
         f"#CardWidget{{background-image: url(images/{used*'BW'}{bg_images[card_type]}.png); background-repeat: none;}}"
         )
 
     #Add Tooltip
-    self.CardWidget.setToolTip(tooltips[card_type])
+    MyCardWidget.setToolTip(tooltips[card_type])
 
     #Add grid which will contains all inputs/outputs
-    self.CardGrid = QtWidgets.QGridLayout(self.CardWidget) #Create grid inside CardWidget
-    self.CardGrid.setHorizontalSpacing(20)
-    self.CardGrid.setVerticalSpacing(2)
+    CardGrid = QtWidgets.QGridLayout(MyCardWidget) #Create grid inside CardWidget
+    CardGrid.setHorizontalSpacing(20)
+    CardGrid.setVerticalSpacing(2)
 
     #Fill the card grid basing on card_type
-    self.fill_grid(the_list, descriptions, card_type, Card.points)
+    self.fill_grid(the_list, descriptions, card_type, Card.points, CardGrid)
 
     #Add CardWidget to Whole_Vertical layout
-    self.WholeVerticalLayout.addWidget(self.CardWidget)
+    WholeVerticalLayout.addWidget(MyCardWidget)
 
 
     #Add WholeWidget to Target layout in the Game window
-    Target.insertWidget(position_in_layout, self.WholeWidget) #inwsert widget replaces addWidget due to its position argument
+    Target.insertWidget(position_in_layout, WholeWidget) #inwsert widget replaces addWidget due to its position argument
 
     #After card is created we're adding some space below for buttons/extre content
     #However, in case we're creating this card for popup, we dont need this!
     if for_popup==True:
-        return self.WholeWidget
+        return WholeWidget
 
     #add anything below cards. It will be replaced later
-    self.BelowCardWidget = QtWidgets.QWidget()
-    self.BelowCardWidget.setFixedHeight(40)
-    self.BelowCardWidget.setStyleSheet('*{background-color: pink}')
-    self.WholeVerticalLayout.addWidget(self.BelowCardWidget)
-    
+    BelowCardWidget = QtWidgets.QWidget()
+    BelowCardWidget.setFixedHeight(40)
+    BelowCardWidget.setStyleSheet('*{background-color: pink}')
+    WholeVerticalLayout.addWidget(BelowCardWidget)
+
 
     
-def fill_grid(self, the_list, descriptions, card_type, points):
+def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
         if card_type == 'Trade' or card_type == 'Harvest':
             for row in range (0, 5):
                 for column in range (0,2):
@@ -122,22 +122,22 @@ def fill_grid(self, the_list, descriptions, card_type, points):
                             "background-repeat: none; "
                             "background-position: center;"
                             )
-                    self.CardGrid.addWidget(Element, row, column)
+                    CardGrid.addWidget(Element, row, column)
 
             #Add description
-            self.Description = QLabel(descriptions[card_type])
+            Description = QLabel(descriptions[card_type])
             #description.setTextFormat(QtCore.Qt.RichText) #In my version of python this line is no needed (it detects html automatically)
-            self.Description.setWordWrap(True)
-            self.Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-            self.Description.setObjectName("description")
-            self.Description.setFixedHeight(60)
-            self.Description.setStyleSheet("*{font-size:10px; padding-top: 11px;}")
-            self.CardGrid.addWidget(self.Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
+            Description.setWordWrap(True)
+            Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+            Description.setObjectName("description")
+            Description.setFixedHeight(60)
+            Description.setStyleSheet("*{font-size:10px; padding-top: 11px;}")
+            CardGrid.addWidget(Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
 
         if card_type == 'Upgrade':
             #Upgrade cards displays only number which defines amout of dies to upgrade and image of gray die
-            self.UpgradeCardHorizotalLayout = QtWidgets.QHBoxLayout()
-            self.CardGrid.addLayout(self.UpgradeCardHorizotalLayout, 0, 0, 2, 1)
+            UpgradeCardHorizotalLayout = QtWidgets.QHBoxLayout()
+            CardGrid.addLayout(UpgradeCardHorizotalLayout, 0, 0, 2, 1)
 
             #Display the number
             Element = QtWidgets.QLabel()
@@ -147,7 +147,7 @@ def fill_grid(self, the_list, descriptions, card_type, points):
                 "font-size:12px; font-weight: bold;"
                 "padding-left: 5px;"
                 )
-            self.UpgradeCardHorizotalLayout.addWidget(Element)
+            UpgradeCardHorizotalLayout.addWidget(Element)
 
             #Display the image of gray die
             Element = QtWidgets.QLabel()
@@ -157,23 +157,23 @@ def fill_grid(self, the_list, descriptions, card_type, points):
                 "background-repeat: none; "
                 "margin-top: 3px"
             )
-            self.UpgradeCardHorizotalLayout.addWidget(Element)
+            UpgradeCardHorizotalLayout.addWidget(Element)
 
             #Then we need empty label to separate first Element from description
             Element = QtWidgets.QLabel()
             Element.setFixedHeight(80)
-            self.CardGrid.addWidget(Element)
+            CardGrid.addWidget(Element)
 
 
             #And finally we'rea dding description
-            self.Description = QLabel(descriptions[card_type])
+            Description = QLabel(descriptions[card_type])
             #description.setTextFormat(QtCore.Qt.RichText) #In my version of python this line is no needed (it detects html automatically)
-            self.Description.setWordWrap(True)
-            self.Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-            self.Description.setObjectName("description")
-            self.Description.setFixedHeight(45)
-            self.Description.setStyleSheet("font-size:10px")
-            self.CardGrid.addWidget(self.Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
+            Description.setWordWrap(True)
+            Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+            Description.setObjectName("description")
+            Description.setFixedHeight(45)
+            Description.setStyleSheet("font-size:10px")
+            CardGrid.addWidget(Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
 
 
         if card_type == 'Treasure':
@@ -185,13 +185,13 @@ def fill_grid(self, the_list, descriptions, card_type, points):
                 "font-size:12px; font-weight: bold;"
                 "padding-left: 8px;"
                 )
-            self.CardGrid.addWidget(Element, 0, 0)
+            CardGrid.addWidget(Element, 0, 0)
 
             #Then we need empty label to separate first Element from description
             Element = QtWidgets.QLabel()
             Element.setFixedSize(105, 90)
-            self.CardGrid.addWidget(Element, 1, 0)
-            self.CardGrid.setHorizontalSpacing(1)
+            CardGrid.addWidget(Element, 1, 0)
+            CardGrid.setHorizontalSpacing(1)
             
             for x in range(0, 6):
                 Element = QtWidgets.QLabel('')
@@ -203,4 +203,4 @@ def fill_grid(self, the_list, descriptions, card_type, points):
                         "background-repeat: none; "
                         "background-position: center;"
                     )
-                self.CardGrid.addWidget(Element, 2, x)
+                CardGrid.addWidget(Element, 2, x)

@@ -3,79 +3,53 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from modules.view.img import img
 from modules.view.Popup import Popup
 
-def press_the_card():
-    pass
 
+def check_if_popup_needed(popup_type, WholeWidget):
+    if popup_type == 'Harvest':
+        #Harvest cards don't have not any requirements to play
+        return True
+    if popup_type == 'Playable':
+        #QuickNote: 
+        # WholeWidget.layout())          <- returns layout INSIDE this widget; 
+        # WholeWidget.parent().layout()) <- returns layout CONTAINS this widget
 
-def take_playable_card(WholeWidget, Card_Widget, Ui, Game, event):
+        #If we're buying Playable card we need to check how close it is to end of the list
+        distance_to_rigth_edge = WholeWidget.parent().layout().count() - WholeWidget.parent().layout().indexOf(WholeWidget) - 1
+        if not distance_to_rigth_edge:
+            return False
+
+    return True
+
+def press_the_card(WholeWidget, CardWidget, Ui, Game, Popup, event):
+    #The parents of Whole Widget are CardWidget->WholeWidget->V/HBoxLayout->ScrollAreaWidgetContents->ScrollArea
+    SourceScrollBox = WholeWidget.parent().parent().parent().objectName()
+    if SourceScrollBox == 'PlayableStore-ScrollArea':
+        popup_type = 'Playable'
+    elif SourceScrollBox == 'BuyableStore-ScrollArea': 
+        popup_type = 'Buyable'
+    elif SourceScrollBox == 'PlayerHand-ScrollArea': 
+        popup_type = CardWidget.Card.card_type
+    else:
+        popup_type = 'unknown'
+
+    CardWidget.Card.popup_type = popup_type
+
     Player = Game.CurrentPlayer
+    
+    #In case Player press another card while popup is visible
+    Popup.close_popup()
 
-    print('heh')
-    print(WholeWidget.parent().parent().parent().objectName())
+    #
+    Popup.configure_popup(popup_type=popup_type, CardWidget=CardWidget, Ui=Ui, Player=Player)
 
-    #Show popup
-    Ui.MyPopup.display_popup()
-    Ui.MyPopup.configure_popup(popup_type='Playable', Card=Card_Widget, Ui=Ui, Player=Player)
+    if check_if_popup_needed(popup_type=popup_type, WholeWidget=WholeWidget):
+        #Show popup
+        Popup.display_popup()
+    else:
+        Popup.action_confirmed(WholeWidget, CardWidget, Ui, Game)
+        pass
 
-    #Move card to PlayerHand and resize playerhand
-    Ui.PlayerHand.HorizontalLayout.addWidget(WholeWidget)
-    Ui.PlayerHand.ScrollAreaWidgetContents.resize(Ui.PlayerHand.ScrollAreaWidgetContents.width()+130, \
-                                                    Ui.PlayerHand.ScrollAreaWidgetContents.height())
-
-    #Remove card-picking event after card is picked. At final version it should be replaced with new function
-    Card_Widget.mouseReleaseEvent=""
-
-def buy_card(WholeWidget, Card_Widget, Ui, Game, event):
-    #First check which player is buying card
-    Player = Game.CurrentPlayer
-
-    #Show popup
-    Ui.MyPopup.display_popup()
-    Ui.MyPopup.configure_popup(popup_type='Treasure', Card=Card_Widget, Ui=Ui, Player=Player)
+    #Next steps should depends on what happened on popup
 
 
-    Player.riches_points += Card_Widget.Card.points
-    Player.riches_count += 1
 
-    if Card_Widget.Card.bonus == 3:
-        Player.coins_gold += 1 
-    if Card_Widget.Card.bonus == 1:
-        Player.coins_silver += 1
-
-    Card_Widget.Card.bonus = 0
-    Player.coins_points = 3 * Player.coins_gold + 1 * Player.coins_silver
-
-    # for x in Card_Widget.Card.the_list[0]:
-    #     if x != '':
-    #         Player.resources.remove(x)
-
-
-    Player.resources_count = len(Player.resources)
-    Player.resources_points = Player.resources_count - Player.resources.count('k1') #every  die other than k1 gives 1 point
-
-    Player.total_points = Player.resources_points + Player.riches_points + Player.coins_points
-
-    update_player_box(Game=Game, Ui=Ui, Player=Player)
-
-    #We are not keeping BuyableCards in player hand. We need to get information about this card and remove it.
-    WholeWidget.deleteLater()
-
-
-def update_player_box(Game, Ui, Player):
-    right_label_content = {1:f'{Player.total_points} POINTS TOTAL', \
-        2:f'[{Player.riches_count:2} /{Game.riches_maximum:2} ] ({Player.riches_points} POINTS)', \
-        3:f'[{Player.coins_gold}G, {Player.coins_silver}S] ({Player.coins_points} POINTS)', \
-        4:f'[{Player.resources_count:02}/10] ({Player.resources_points} POINTS)', \
-        5:f'[ \
-        {Player.resources.count("k1")} {img(file_name="k1", width=14, height=16)}| \
-        {Player.resources.count("k2")} {img(file_name="k2", width=14, height=16)}| \
-        {Player.resources.count("k3")} {img(file_name="k3", width=14, height=16)}| \
-        {Player.resources.count("k4")} {img(file_name="k4", width=14, height=16)} ]'}                    
-
-    #As all players have the objects with the same name inside playerbox, we have to find their box first
-    CurrentPlayerBox = Ui.Screen.findChild(QtWidgets.QWidget, f'player_{Player.no}_box')
-
-    for x in range(1,6):
-        #as we know CurrentPlayerBox, we now can search for specified row
-        RightSideLabel = CurrentPlayerBox.findChild(QtWidgets.QWidget, f'{x}-RIGHT')
-        RightSideLabel.setText(right_label_content[x])

@@ -5,7 +5,7 @@ from modules.model.Card import Card
 class Deck:
     """Class which contains CARDS objects and allows to operate on that objects"""
     def __init__(self, source_file):
-        #Load playable cards from csv file
+        #Load Playable cards from csv file
         self.load_cards(source_file)
         del (self.cards[0]) #Deleting header row in source file
         self.shuffle()
@@ -17,7 +17,7 @@ class Deck:
         with open(path, newline='') as csvfile:
             self.cards = list(csv.reader(csvfile, delimiter=';')) #I've removed "quotechar='|'" 
         
-        if source_file=='buyable':
+        if source_file=='Buyable':
             pass
 
         #Converting all strings into the Card objects

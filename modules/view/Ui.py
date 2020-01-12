@@ -7,7 +7,7 @@ import datetime
 from modules.view.ScrollBox import ScrollBox
 from modules.view.img import img
 from modules.controller.add_to_history import add_to_history
-from modules.view.Popup import Popup
+
 
 
 class Ui:
@@ -39,21 +39,21 @@ class Ui:
         
         #Prepare space to contain cards
         #playable
-        self.buyableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=5, \
-            x_pos=700, y_pos=150, height=200, prefix='buyableStore')
+        self.BuyableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=5, \
+            x_pos=700, y_pos=150, height=200, prefix='BuyableStore')
         #buyable
-        self.playableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=6, \
-            x_pos=570, y_pos=355, height=200, prefix='playableStore')
+        self.PlayableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=6, \
+            x_pos=570, y_pos=355, height=200, prefix='PlayableStore')
         #player hand
         self.PlayerHand = ScrollBox(parentWidget=self.Screen, cards_cnt=8, \
             x_pos=300, y_pos=570, height=220, prefix='playerHand')
 
         #Display cards in storages        
         for Card in Game.playable_store_cards:
-            self.display_card(Card=Card, Target=self.playableStore.HorizontalLayout)
+            self.display_card(Card=Card, Target=self.PlayableStore.HorizontalLayout)
 
         for Card in Game.buyable_store_cards:
-            self.display_card(Card=Card, Target=self.buyableStore.HorizontalLayout)
+            self.display_card(Card=Card, Target=self.BuyableStore.HorizontalLayout)
 
         #Display cards in player hand
         for Card in Game.players[0].player_hand:
@@ -80,6 +80,5 @@ class Ui:
         #show screen
         self.Screen.show()
 
-        #Create Popup to comunicate with player after he pressed something
-        self.MyPopup = Popup(Game=self.Game, Screen=self.Screen)
+
 

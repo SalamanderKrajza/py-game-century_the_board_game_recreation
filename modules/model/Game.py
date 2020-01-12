@@ -21,21 +21,21 @@ class Game:
             #Define when game will end
             self.riches_maximum = 9
 
-            #Create Deck of playable cards based on source_filefile. Cards are not objects yet
-            self.DeckPlayable = Deck(source_file='playable')
+            #Create Deck of Playable cards based on source_filefile. Cards are not objects yet
+            self.DeckPlayable = Deck(source_file='Playable')
 
             #Create Deck of buyabe cards based on source_file. Cards are not objects yet
-            self.DeckBuyable = Deck(source_file='buyable')
+            self.DeckBuyable = Deck(source_file='Buyable')
 
             #Create empty lists of cards aviable on gameboard
             self.playable_store_cards = list()
             self.buyable_store_cards = list()
 
-            #Pick 6 playable cards from deck to store (these cards are available for players to interact with)
+            #Pick 6 Playable cards from deck to store (these cards are available for players to interact with)
             for x in range(0, 6):
                 self.playable_store_cards.append(self.DeckPlayable.pickOneCard())
 
-            #Pick 5 buyable cards from deck to store (these cards are available for players to interact with)
+            #Pick 5 Buyable cards from deck to store (these cards are available for players to interact with)
             for x in range(0, 5):
                 self.buyable_store_cards.append(self.DeckBuyable.pickOneCard())
 
