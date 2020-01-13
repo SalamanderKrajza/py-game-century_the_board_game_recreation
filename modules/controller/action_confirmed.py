@@ -5,6 +5,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 #This is part of controller class
 def action_confirmed(self, WholeWidget, CardWidget, Ui, Game):
+    return
+
+    from modules.controller.take_card import press_the_card
+    from functools import partial
     Player = Game.CurrentPlayer
 
     #print(f'{self}\n{WholeWidget.objectName()}\n{CardWidget.objectName()}')
@@ -12,6 +16,24 @@ def action_confirmed(self, WholeWidget, CardWidget, Ui, Game):
 
 
     if self.popup_type == 'Buyable':
+        #If card is taken from one of two closest to right edge spots, it could contain extra coins.
+        self.distance_to_right_edge = WholeWidget.parent().layout().count() - WholeWidget.parent().layout().indexOf(WholeWidget) - 1
+        if self.distance_to_right_edge == 0:
+            #This card could have gold coin on it!
+            if Game.gold_coins_counter > 0:
+                Game.gold_coins_counter -= 1
+                CardWidget.Card.bonus = 3
+
+        elif self.distance_to_right_edge == 1:
+            #This card could have silver coin on it!
+            if Game.silver_coins_counter > 0:
+                Game.silver_coins_counter -= 1
+                CardWidget.Card.bonus = 1
+
+        #Display information about extra coins
+        Ui.GoldCoinsLabel.setText(f'<center>+ GOLD COIN  <br>({Game.gold_coins_counter} left)</center>')
+        Ui.SilverCoinsLabel.setText(f'<center>+ SILVER COIN<br>({Game.silver_coins_counter} left)</center>')
+
         #Increase player Treasure points and Treasure counter
         Player.riches_points += CardWidget.Card.points
         Player.riches_count += 1
@@ -21,7 +43,6 @@ def action_confirmed(self, WholeWidget, CardWidget, Ui, Game):
             Player.coins_gold += 1 
         if CardWidget.Card.bonus == 1:
             Player.coins_silver += 1
-
         CardWidget.Card.bonus = 0
         Player.coins_points = 3 * Player.coins_gold + 1 * Player.coins_silver
 
@@ -40,6 +61,12 @@ def action_confirmed(self, WholeWidget, CardWidget, Ui, Game):
         #Update displayed data
         update_player_box(Game=Game, Ui=Ui, Player=Player)
 
+        #Pick new from the deck to PlayableStore
+        NewCardWidget = Ui.display_card(Card=Game.DeckBuyable.pickOneCard(), Target=Ui.BuyableStore.HorizontalLayout)
+
+        #Assign onclick event to this new card        
+        NewCardWidget.mouseReleaseEvent=partial(press_the_card, NewCardWidget.parent(), NewCardWidget, Ui,  Game, self)
+
         #We are not keeping BuyableCards in player hand. We need to get information about this card and remove it.
         WholeWidget.deleteLater()
 
@@ -53,15 +80,16 @@ def action_confirmed(self, WholeWidget, CardWidget, Ui, Game):
         Ui.PlayerHand.HorizontalLayout.insertWidget(999, WholeWidget) 
 
         #Pick new from the deck to PlayableStore
-        Ui.display_card(Card=Game.DeckPlayable.pickOneCard(), Target=Ui.PlayableStore.HorizontalLayout)
-        #Assign onclick event to this new card
+        NewCardWidget = Ui.display_card(Card=Game.DeckPlayable.pickOneCard(), Target=Ui.PlayableStore.HorizontalLayout)
 
+        #Assign onclick event to this new card        
+        NewCardWidget.mouseReleaseEvent=partial(press_the_card, NewCardWidget.parent(), NewCardWidget, Ui,  Game, self)
 
+        #Add picked card to PlayerHand
         Ui.PlayerHand.HorizontalLayout.addWidget(WholeWidget)
         Ui.PlayerHand.ScrollAreaWidgetContents.resize(Ui.PlayerHand.ScrollAreaWidgetContents.width()+130, \
                                                     Ui.PlayerHand.ScrollAreaWidgetContents.height())
        
-
         #We need to hide Popup after action is finished
         self.close_popup()
 

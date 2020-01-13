@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+#This is part of Ui class
 def display_game_window(self):
     """This method defines all properties of window which contains the Game"""
     self.Screen = QtWidgets.QWidget() #MyGame_Screen is entire screen which contains all objects (Cards, score etc)

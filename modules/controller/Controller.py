@@ -24,6 +24,7 @@ class Controller:
         #Find widgets for card with specific number on Playablestore layout
         WholeWidget = which_layout.itemAt(card_number).widget()
         CardWidget = which_layout.itemAt(card_number).widget().children()[1]
+        print(f'Im in controller (assign_onclick...): CardWidget.BelowCardWidget_PlayerHand {CardWidget.BelowCardWidget_PlayerHand}')
 
         #check if references are correct
         self._check_refferences(WholeWidget=WholeWidget, CardWidget=CardWidget)

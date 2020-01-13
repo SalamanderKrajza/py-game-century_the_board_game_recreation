@@ -13,3 +13,4 @@ class Card:
         self.points =int(points)
         self.bonus = bonus
         self.popup_type = 'unknown' #This will change when card is clicked
+

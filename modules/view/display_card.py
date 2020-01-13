@@ -13,6 +13,8 @@ class CardWidget(QtWidgets.QWidget):
     def __init__(self, Card, parent = None):
         QtWidgets.QWidget.__init__(self, parent)
         self.Card = Card
+        self.BelowCardWidget_PlayerHand = 'This will be replaced with widget'
+        self.BelowCardWidget_PlayableStore ='This will be replaced with widget'
 
     def paintEvent(self, event):
         #Subclasses from QWidget loses their ability to use StyleSheets
@@ -24,7 +26,7 @@ class CardWidget(QtWidgets.QWidget):
         painter = QPainter(self)
         self.style().drawPrimitive(QStyle.PE_Widget, opt, painter, self)
 
-
+#This is part of Ui class
 def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     """Defines how and where given card should be displayed"""
     used = Card.used
@@ -71,6 +73,9 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
 
     #Create CardWidget
     #MyCardWidget = QtWidgets.QWidget()
+    if 'MyGame_Screen' == Target.parent().parent().parent().objectName():
+        print('We are debuging it')
+
     MyCardWidget = CardWidget(Card)
     MyCardWidget.setFixedSize(120, 160)
     MyCardWidget.setObjectName("CardWidget")
@@ -94,21 +99,43 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
 
 
     #Add WholeWidget to Target layout in the Game window
-    Target.insertWidget(position_in_layout, WholeWidget) #inwsert widget replaces addWidget due to its position argument
+    if Target.parent().parent().objectName() != 'PopupWidget': 
+        Target.insertWidget(position_in_layout, WholeWidget)
+    else: 
+        #For popup we're not adding WholeWidget because we dont need extra container for additional buttons or resources
+        Target.insertWidget(position_in_layout, MyCardWidget) 
+    
+    print(f'\ncalled display_card target layout objectName: {Target.parent().parent().parent().objectName()}')
+    print(f'(before)MyCardWidget.BelowCardWidget_PlayerHand: {MyCardWidget.BelowCardWidget_PlayerHand}')
 
     #After card is created we're adding some space below for buttons/extre content
     #However, in case we're creating this card for popup, we dont need this!
-    if for_popup==True:
-        return WholeWidget
-
-    #add anything below cards. It will be replaced later
-    BelowCardWidget = QtWidgets.QWidget()
-    BelowCardWidget.setFixedHeight(40)
-    BelowCardWidget.setStyleSheet('*{background-color: pink}')
-    WholeVerticalLayout.addWidget(BelowCardWidget)
-
-
+    #if Target == self.PlayableStore.HorizontalLayout or Target == self.PlayerHand.HorizontalLayout:
+        #add anything below cards. It will be replaced later
+    MyCardWidget.Card.BelowCardWidget_PlayableStore = QtWidgets.QWidget()
+    MyCardWidget.Card.BelowCardWidget_PlayableStore.setObjectName('BelowCard_PlayableStore')
+    MyCardWidget.Card.BelowCardWidget_PlayableStore.setFixedHeight(40)
+    MyCardWidget.Card.BelowCardWidget_PlayableStore.setStyleSheet('*{background-color: pink}')
+    WholeVerticalLayout.addWidget(MyCardWidget.Card.BelowCardWidget_PlayableStore)
     
+
+    MyCardWidget.BelowCardWidget_PlayerHand = QtWidgets.QWidget()
+    MyCardWidget.BelowCardWidget_PlayerHand.setObjectName('BelowCard_PlayerHand')
+    MyCardWidget.BelowCardWidget_PlayerHand.setFixedHeight(40)
+    MyCardWidget.BelowCardWidget_PlayerHand.setStyleSheet('*{background-color: red}')
+    WholeVerticalLayout.addWidget(MyCardWidget.BelowCardWidget_PlayerHand)
+    
+
+    print(f'(after) MyCardWidget.BelowCardWidget_PlayerHand: {MyCardWidget.BelowCardWidget_PlayerHand}')
+
+    if Target != self.PlayableStore.HorizontalLayout: MyCardWidget.Card.BelowCardWidget_PlayableStore.hide()
+    if Target != self.PlayerHand.HorizontalLayout: MyCardWidget.BelowCardWidget_PlayerHand.hide()
+
+    #If we are not creating this card for popup, we should return CardWidget so we can assign event to it
+    return MyCardWidget
+
+
+#This is part of Ui class
 def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
         if card_type == 'Trade' or card_type == 'Harvest':
             for row in range (0, 5):

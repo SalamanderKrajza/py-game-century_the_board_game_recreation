@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
 from modules.view.img import img
 
+#This is part of Ui class
 def player_box(self, Player, x_pos, y_pos, width=240, height=130):
     """Method used for adding area which displays Player points and resources"""
     PlayerBoxWidget = QtWidgets.QWidget(self.Screen)
