@@ -4,9 +4,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class ScrollBox:
     """Class which helps creating new ScrollBoxes on the gamescreen. It also keeps all related properties"""
     def __init__(self, parentWidget, cards_cnt, x_pos, y_pos, height, prefix, scrollbox_type='standard'):
+        extra_space_for_scrollbar = 0 + (scrollbox_type == 'PlayerHand')*15
+
         #Create outer area
         self.ScrollArea = QtWidgets.QScrollArea(parentWidget)
-        self.ScrollArea.setGeometry(QtCore.QRect(x_pos, y_pos, 130*cards_cnt+2, height))
+        self.ScrollArea.setGeometry(QtCore.QRect(x_pos, y_pos, 130*cards_cnt+2, height+2+extra_space_for_scrollbar))
         self.ScrollArea.setObjectName(f"{prefix}-ScrollArea")
 
         self.ScrollArea.setStyleSheet(
@@ -35,4 +37,4 @@ class ScrollBox:
         
 
         #Resize innerContent
-        self.ScrollAreaWidgetContents.resize(130*cards_cnt-2, height)
+        self.ScrollAreaWidgetContents.resize(130*cards_cnt-2, height-4)

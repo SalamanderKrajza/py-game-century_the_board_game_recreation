@@ -5,6 +5,8 @@ from modules.view.img import img
 
 from PyQt5.QtWidgets import QStyleOption, QStyle
 from PyQt5.QtGui import QPainter
+from modules.view.dictionaries import bg_images, tooltips, descriptions
+
 
 
 
@@ -29,9 +31,6 @@ class CardWidget(QtWidgets.QWidget):
 #This is part of Ui class
 def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     """Defines how and where given card should be displayed"""
-    used = Card.used
-    card_type = Card.card_type
-    the_list = Card.the_list
 
     #CB is space for card and area below reserved for buttons/additional dies/additional money
     WholeWidget = QtWidgets.QWidget()
@@ -43,56 +42,24 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     WholeVerticalLayout.setSpacing(0)
     WholeVerticalLayout.setContentsMargins(0,0,0,0)
 
-    #CardWidgetPart
-    #define bacground based on card card_type
-    bg_images = {
-        "Trade":"tradecard", 
-        "Upgrade":"upgradecard", 
-        "Harvest":"harvestcard", 
-        "Treasure":"treasurecard"}
-    tooltips = {
-        "Trade":"<u><b>Card description</b></u><br>\
-        Replaces dies from left side of the card by dies from the right side<br><br> \
-        Can be used multiple time (if player have enough dies)",
-        "Upgrade":"<u><b>Card description</b></u><br>\
-        Upgrades specific amount of dies according to rules displayed on the card)",
-        "Harvest":"<u><b>Card description</b></u><br>\
-        Produces dies when played",
-        "Treasure":"<u><b>Card description</b></u><br>\
-        You can buy it to get the score",
-    }
-    descriptions = {
-        "Trade":"<u><b>Card description</b></u><br>\
-        Replaces left dies with right dies",
-        "Upgrade":"<u><b>Card description</b></u><br>\
-        Upgrades specific amount of dies",
-        "Harvest":"<u><b>Card description</b></u><br>\
-        Produces dies when played",
-        "Treasure":""
-    }
-
     #Create CardWidget
-    #MyCardWidget = QtWidgets.QWidget()
-    if 'MyGame_Screen' == Target.parent().parent().parent().objectName():
-        print('We are debuging it')
-
     MyCardWidget = CardWidget(Card)
     MyCardWidget.setFixedSize(120, 160)
     MyCardWidget.setObjectName("CardWidget")
     MyCardWidget.setStyleSheet(
-        f"#CardWidget{{background-image: url(images/{used*'BW'}{bg_images[card_type]}.png); background-repeat: none;}}"
+        f"#CardWidget{{background-image: url(images/{Card.used*'BW'}{bg_images[Card.card_type]}.png); background-repeat: none;}}"
         )
 
     #Add Tooltip
-    MyCardWidget.setToolTip(tooltips[card_type])
+    MyCardWidget.setToolTip(tooltips[Card.card_type])
 
     #Add grid which will contains all inputs/outputs
     CardGrid = QtWidgets.QGridLayout(MyCardWidget) #Create grid inside CardWidget
     CardGrid.setHorizontalSpacing(20)
     CardGrid.setVerticalSpacing(2)
 
-    #Fill the card grid basing on card_type
-    self.fill_grid(the_list, descriptions, card_type, Card.points, CardGrid)
+    #Fill the card grid basing on Card.card_type
+    self.fill_grid(Card=Card, CardGrid=CardGrid, descriptions=descriptions)
 
     #Add CardWidget to Whole_Vertical layout
     WholeVerticalLayout.addWidget(MyCardWidget)
@@ -105,63 +72,116 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
         #For popup we're not adding WholeWidget because we dont need extra container for additional buttons or resources
         Target.insertWidget(position_in_layout, MyCardWidget) 
     
-    print(f'\ncalled display_card target layout objectName: {Target.parent().parent().parent().objectName()}')
-    print(f'(before)MyCardWidget.BelowCardWidget_PlayerHand: {MyCardWidget.BelowCardWidget_PlayerHand}')
-
     #After card is created we're adding some space below for buttons/extre content
-    #However, in case we're creating this card for popup, we dont need this!
-    #if Target == self.PlayableStore.HorizontalLayout or Target == self.PlayerHand.HorizontalLayout:
-        #add anything below cards. It will be replaced later
-    MyCardWidget.Card.BelowCardWidget_PlayableStore = QtWidgets.QWidget()
-    MyCardWidget.Card.BelowCardWidget_PlayableStore.setObjectName('BelowCard_PlayableStore')
-    MyCardWidget.Card.BelowCardWidget_PlayableStore.setFixedHeight(40)
-    MyCardWidget.Card.BelowCardWidget_PlayableStore.setStyleSheet('*{background-color: pink}')
-    WholeVerticalLayout.addWidget(MyCardWidget.Card.BelowCardWidget_PlayableStore)
-    
+    #We have 4 possible places when cards can be displayed
+    #1. BuyableStore - this dont require any widget which contains something below each rad. 
+    # We have some space for silver/gold coins conter, but it have fixed place and isn't connected with card 
+    #2. Popup - we're not displaying anything expect the card here
+    #3. PlayableStore - Playable cards that player is picking needs widget which will contain resources left on the card 
+    MyCardWidget.BelowCardWidget_PlayableStore = QtWidgets.QWidget()
+    MyCardWidget.BelowCardWidget_PlayableStore.setObjectName('BelowCard_PlayableStore')
+    MyCardWidget.BelowCardWidget_PlayableStore.setFixedHeight(40)
+    MyCardWidget.BelowCardWidget_PlayableStore.setStyleSheet('*{background-color: transparent}')
+    WholeVerticalLayout.addWidget(MyCardWidget.BelowCardWidget_PlayableStore)
+    MyCardWidget.BelowCardWidget_PlayableStore_Label = QtWidgets.QLabel(MyCardWidget.BelowCardWidget_PlayableStore)
+    MyCardWidget.BelowCardWidget_PlayableStore_Label.setFixedSize(120, 40)
 
+    #4. PlayerHand - this cards needs some space extra action buttons (Like move card left/right)
     MyCardWidget.BelowCardWidget_PlayerHand = QtWidgets.QWidget()
     MyCardWidget.BelowCardWidget_PlayerHand.setObjectName('BelowCard_PlayerHand')
     MyCardWidget.BelowCardWidget_PlayerHand.setFixedHeight(40)
-    MyCardWidget.BelowCardWidget_PlayerHand.setStyleSheet('*{background-color: red}')
+    MyCardWidget.BelowCardWidget_PlayerHand.setStyleSheet(
+                                    "QPushButton{"
+                                    "background-color: #b19686; "
+                                    "border: 1px solid black;"
+                                    "border-radius: 8;"
+                                    "font-size: 12px;  font-weight: 500;"
+                                    "}"
+                                    "QPushButton:hover{"
+                                    "background-color: #e5e2d7;"
+                                    "}"
+                                    )
     WholeVerticalLayout.addWidget(MyCardWidget.BelowCardWidget_PlayerHand)
-    
+    #Add layout for extra buttons assigned to card
+    BelowCardLayoutForButtons_PlayerHand = QtWidgets.QHBoxLayout(MyCardWidget.BelowCardWidget_PlayerHand)
+    BelowCardLayoutForButtons_PlayerHand.setContentsMargins(8,0,8,0)
+    #Add buttons:
+    MyCardWidget.LeftMoveByButton = QtWidgets.QPushButton()
+    MyCardWidget.LeftMoveByButton.setFixedHeight(25)
+    MyCardWidget.LeftMoveByButton.setStyleSheet(
+                            'background-image: url(images/move_by_left.png);'
+                            'background-repeat: none; '
+                            'background-position: center;'
+                            )
+    MyCardWidget.RightMoveByButton = QtWidgets.QPushButton()
+    MyCardWidget.RightMoveByButton.setFixedHeight(25)
+    MyCardWidget.RightMoveByButton.setStyleSheet(
+                            'background-image: url(images/move_by_right.png);'
+                            'background-repeat: none; '
+                            'background-position: center;'
+                            )
+    MyCardWidget.LeftMoveToButton = QtWidgets.QPushButton()
+    MyCardWidget.LeftMoveToButton.setFixedHeight(25)
+    MyCardWidget.LeftMoveToButton.setStyleSheet(
+                            'background-image: url(images/move_to_left.png);'
+                            'background-repeat: none; '
+                            'background-position: center;'
+                            )
+    MyCardWidget.RightMoveToButton = QtWidgets.QPushButton()
+    MyCardWidget.RightMoveToButton.setFixedHeight(25)
+    MyCardWidget.RightMoveToButton.setStyleSheet(
+                            'background-image: url(images/move_to_right.png);'
+                            'background-repeat: none; '
+                            'background-position: center;'
+                            )
 
-    print(f'(after) MyCardWidget.BelowCardWidget_PlayerHand: {MyCardWidget.BelowCardWidget_PlayerHand}')
+    BelowCardLayoutForButtons_PlayerHand.addWidget(MyCardWidget.LeftMoveToButton)
+    BelowCardLayoutForButtons_PlayerHand.addWidget(MyCardWidget.LeftMoveByButton)
+    BelowCardLayoutForButtons_PlayerHand.addWidget(MyCardWidget.RightMoveByButton)
+    BelowCardLayoutForButtons_PlayerHand.addWidget(MyCardWidget.RightMoveToButton)
 
-    if Target != self.PlayableStore.HorizontalLayout: MyCardWidget.Card.BelowCardWidget_PlayableStore.hide()
+
+    from functools import partial
+    MyCardWidget.LeftMoveByButton.clicked.connect(partial(self.move_card, WholeWidget, -1, 'move_by'))
+    MyCardWidget.RightMoveByButton.clicked.connect(partial(self.move_card, WholeWidget, 1, 'move_by'))
+    MyCardWidget.LeftMoveToButton.clicked.connect(partial(self.move_card, WholeWidget, -1, 'move_to'))
+    MyCardWidget.RightMoveToButton.clicked.connect(partial(self.move_card, WholeWidget, 1, 'move_to'))
+
+    if Target != self.PlayableStore.HorizontalLayout: MyCardWidget.BelowCardWidget_PlayableStore.hide()
     if Target != self.PlayerHand.HorizontalLayout: MyCardWidget.BelowCardWidget_PlayerHand.hide()
 
     #If we are not creating this card for popup, we should return CardWidget so we can assign event to it
     return MyCardWidget
 
 
+
 #This is part of Ui class
-def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
-        if card_type == 'Trade' or card_type == 'Harvest':
+def fill_grid(self, Card, descriptions, CardGrid):
+        if Card.card_type == 'Trade' or Card.card_type == 'Harvest':
             for row in range (0, 5):
                 for column in range (0,2):
                     #Add all inputs and outputs to the grid
                     Element = QtWidgets.QLabel()
                     Element.setText = ""
-                    if the_list[column][row] != "":
+                    if Card.the_list[column][row] != "":
                         Element.setStyleSheet(
-                            f"background-image: url(images/{the_list[column][row]}.png);"
+                            f"background-image: url(images/{Card.the_list[column][row]}.png);"
                             "background-repeat: none; "
                             "background-position: center;"
                             )
                     CardGrid.addWidget(Element, row, column)
 
             #Add description
-            Description = QLabel(descriptions[card_type])
+            Description = QLabel(descriptions[Card.card_type])
             #description.setTextFormat(QtCore.Qt.RichText) #In my version of python this line is no needed (it detects html automatically)
             Description.setWordWrap(True)
             Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
             Description.setObjectName("description")
-            Description.setFixedHeight(60)
+            Description.setFixedHeight(55)
             Description.setStyleSheet("*{font-size:10px; padding-top: 11px;}")
             CardGrid.addWidget(Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
 
-        if card_type == 'Upgrade':
+        if Card.card_type == 'Upgrade':
             #Upgrade cards displays only number which defines amout of dies to upgrade and image of gray die
             UpgradeCardHorizotalLayout = QtWidgets.QHBoxLayout()
             CardGrid.addLayout(UpgradeCardHorizotalLayout, 0, 0, 2, 1)
@@ -169,7 +189,7 @@ def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
             #Display the number
             Element = QtWidgets.QLabel()
             Element.setFixedSize(20, 20)
-            Element.setText(f'{the_list[0][0]}')
+            Element.setText(f'{Card.the_list[0][0]}')
             Element.setStyleSheet(
                 "font-size:12px; font-weight: bold;"
                 "padding-left: 5px;"
@@ -193,7 +213,7 @@ def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
 
 
             #And finally we'rea dding description
-            Description = QLabel(descriptions[card_type])
+            Description = QLabel(descriptions[Card.card_type])
             #description.setTextFormat(QtCore.Qt.RichText) #In my version of python this line is no needed (it detects html automatically)
             Description.setWordWrap(True)
             Description.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
@@ -203,11 +223,11 @@ def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
             CardGrid.addWidget(Description, 7, 0, 1, 2) #row, column, how many rows, how many columns
 
 
-        if card_type == 'Treasure':
+        if Card.card_type == 'Treasure':
             #Treasure cards displays amount of points they're giving to their owner
             Element = QtWidgets.QLabel()
             Element.setFixedWidth(35)
-            Element.setText(f'{points}')
+            Element.setText(f'{Card.points}')
             Element.setStyleSheet(
                 "font-size:12px; font-weight: bold;"
                 "padding-left: 8px;"
@@ -224,9 +244,9 @@ def fill_grid(self, the_list, descriptions, card_type, points, CardGrid):
                 Element = QtWidgets.QLabel('')
                 Element.setFixedWidth(16)
                 Element.setObjectName("bigger_labels")
-                if the_list[0][x]!='':
+                if Card.the_list[0][x]!='':
                     Element.setStyleSheet(
-                        f"background-image: url(images/{the_list[0][x]}.png);"
+                        f"background-image: url(images/{Card.the_list[0][x]}.png);"
                         "background-repeat: none; "
                         "background-position: center;"
                     )

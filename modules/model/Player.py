@@ -31,7 +31,7 @@ class Player():
 
         #Pick pick some starting resources based on player order
         if self.no == 0:
-            self.resources = ['k1','k1','k1', 'k2','k2','k2', 'k3','k3','k3'] #orginally 3x k1
+            self.resources = ['k1','k1','k1', 'k2','k2','k2', 'k3','k3','k3', 'k4'] #orginally 3x k1
         elif self.no == 1:
             self.resources = ['k1','k1','k1', 'k1']
         elif self.no == 2:

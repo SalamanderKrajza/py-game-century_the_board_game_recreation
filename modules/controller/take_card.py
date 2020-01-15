@@ -7,8 +7,8 @@ from modules.view.Popup import Popup
 def check_if_popup_needed(popup_type, distance_to_right_edge=99):
     if popup_type == 'Harvest':
         #Harvest cards don't have not any requirements to play
-        return True
-    if popup_type == 'Playable':
+        return False
+    if popup_type == 'PlayableStore':
         #If we're buying Playable card we need to check how close it is to end of the list
         if not distance_to_right_edge:
             return False
@@ -16,19 +16,18 @@ def check_if_popup_needed(popup_type, distance_to_right_edge=99):
     return True
 
 def press_the_card(ClickedWholeWidget, ClickedCardWidget, Ui, Game, Popup, event):
-    """
-    Defines which actions should happened when card is pressed
-    """
+    """Defines which actions should happened when card is pressed"""
 
-    print(f'Im in press_the_card: ClickedCardWidget.BelowCardWidget_PlayerHand {ClickedCardWidget.BelowCardWidget_PlayerHand}')
-
+    #If status is "USED" we shouldn't be able to press it untill player rest
+    if ClickedCardWidget.Card.used == True:
+        return
 
     #The parents of Whole Widget are ClickedCardWidget->ClickedWholeWidget->V/HBoxLayout->ScrollAreaWidgetContents->ScrollArea
     SourceScrollBox = ClickedWholeWidget.parent().parent().parent().objectName()
     if SourceScrollBox == 'PlayableStore-ScrollArea':
-        popup_type = 'Playable'
+        popup_type = 'PlayableStore'
     elif SourceScrollBox == 'BuyableStore-ScrollArea': 
-        popup_type = 'Buyable'
+        popup_type = 'BuyableStore'
     elif SourceScrollBox == 'PlayerHand-ScrollArea': 
         popup_type = ClickedCardWidget.Card.card_type
     else:
@@ -41,7 +40,6 @@ def press_the_card(ClickedWholeWidget, ClickedCardWidget, Ui, Game, Popup, event
     #In case Player press another card while popup is visible
     Popup.close_popup()
 
-    #
     Popup.configure_popup(popup_type=popup_type, ClickedCardWidget=ClickedCardWidget, Ui=Ui)
 
     if check_if_popup_needed(popup_type=popup_type, distance_to_right_edge=Popup.distance_to_right_edge):

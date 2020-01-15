@@ -16,6 +16,7 @@ class Ui:
     from modules.view.display_card import fill_grid
     from modules.view.add_text_label import add_text_label
     from modules.view.player_box import player_box
+    from modules.controller.cards_actions import move_card
     """Class responsible for management of graphic interface of Game"""
     def __init__(self, Game):
         self.Game = Game
@@ -37,13 +38,13 @@ class Ui:
         #Prepare space to contain cards
         #playable
         self.BuyableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=5, \
-            x_pos=700, y_pos=150, height=164, prefix='BuyableStore')
+            x_pos=700, y_pos=145, height=164, prefix='BuyableStore')
         #buyable
         self.PlayableStore = ScrollBox(parentWidget=self.Screen, cards_cnt=6, \
-            x_pos=570, y_pos=355, height=200, prefix='PlayableStore')
+            x_pos=570, y_pos=350, height=200, prefix='PlayableStore')
         #player hand
         self.PlayerHand = ScrollBox(parentWidget=self.Screen, cards_cnt=8, \
-            x_pos=300, y_pos=570, height=220, prefix='PlayerHand')
+            x_pos=308, y_pos=565, height=210, prefix='PlayerHand', scrollbox_type='PlayerHand')
 
         #Display cards in storages        
         for Card in Game.playable_store_cards:
@@ -69,8 +70,8 @@ class Ui:
         self.history.ScrollAreaWidgetContents.resize(self.history.ScrollAreaWidgetContents.width(), 20)
 
         #Display information about extra coins
-        self.GoldCoinsLabel = self.add_text_label(content=f'<center>+ GOLD COIN  <br>({Game.gold_coins_counter} left)</center>', x_pos=1240, y_pos=316, font_size=12, font_weight=600 ,custom_style_sheet='background-color:#b38b79; border: 1px solid black;  border-radius:8; padding:3px 8px 3px 6px')
-        self.SilverCoinsLabel = self.add_text_label(content=f'<center>+ SILVER COIN<br>({Game.silver_coins_counter} left)</center>', x_pos=1105, y_pos=316, font_size=12, font_weight=600 ,custom_style_sheet='background-color:#b38b79; border: 1px solid black; border-radius:8; padding:3px 4px 3px 3px')
+        self.GoldCoinsLabel = self.add_text_label(content=f'<center>+ GOLD COIN  <br>({Game.gold_coins_counter} left)</center>', x_pos=1240, y_pos=311, font_size=12, font_weight=600 ,custom_style_sheet='background-color:#b38b79; border: 1px solid black;  border-radius:8; padding:3px 8px 3px 6px')
+        self.SilverCoinsLabel = self.add_text_label(content=f'<center>+ SILVER COIN<br>({Game.silver_coins_counter} left)</center>', x_pos=1105, y_pos=311, font_size=12, font_weight=600 ,custom_style_sheet='background-color:#b38b79; border: 1px solid black; border-radius:8; padding:3px 4px 3px 3px')
 
         #Filling the history with something for tests
         HTMLtext = (f'has played [Trade] card [1 times].<br> \
