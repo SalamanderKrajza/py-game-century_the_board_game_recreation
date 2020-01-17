@@ -15,15 +15,14 @@ class Game:
         else:
             #Create Players
             self.players = list()
-            for x in range (0, 4):
+            for x in range (0, 2):
                 self.players.append(Player(name=f'player{x+1}', no=x)) #It could be any names but for now we're creating players 1, 2 etc
 
             #Define some game attributes
             self.riches_maximum = 9
+            self.resources_maximum = 10
             self.gold_coins_counter = 10 
             self.silver_coins_counter = 10
-
-            
 
             #Create Deck of Playable cards based on source_filefile. Cards are not objects yet
             self.DeckPlayable = Deck(source_file='Playable')
@@ -46,5 +45,4 @@ class Game:
             #Create variable which monitor current player
             self.current_player_no = self.players[0].no
             self.CurrentPlayer = self.players[0]
-
-
+            self.turn_no = 0

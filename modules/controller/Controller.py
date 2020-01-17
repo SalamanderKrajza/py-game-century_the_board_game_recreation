@@ -10,12 +10,7 @@ class Controller:
         self.Ui = Ui
         self.Popup = Popup
 
-        #######################Game start:
-        #Make initial note in game history
-        for x in range(0, 5):
-            add_to_history(history=Ui.history, HTMLtext='The game has been started')
-
-        #Add onclick event to cards in player hand  
+        #Add onclick event to cards
         for Layout in [Ui.BuyableStore.HorizontalLayout, Ui.PlayableStore.HorizontalLayout, Ui.PlayerHand.HorizontalLayout]:
             for x in range(0, Layout.count()):
                 self.assign_onclick_event_to_card(card_number=x, which_layout=Layout)

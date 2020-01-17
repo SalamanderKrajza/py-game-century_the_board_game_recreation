@@ -2,14 +2,20 @@ from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
 from modules.view.img import img
 import datetime
-def add_to_history(history, who='Game', HTMLtext='', note_type='custom'):
+
+def add_to_history(Ui, who='Game', HTMLtext=''):
+    history = Ui.history
+    Game = Ui.Game 
     #get current time
     now = datetime.datetime.now()
 
     #create label
     Temp = QtWidgets.QLabel( \
-        f'<font color=\"blue\">[{now.hour:02d}:{now.minute:02d}:{now.second:02d}]</font> \
-        [{who}] {HTMLtext}')
+            f'<font color=\"#600\">[{now.hour:02d}:{now.minute:02d}:{now.second:02d}]'
+            f'[Turn {Game.turn_no}]'
+            f'[{who}] </font>'
+            f'{HTMLtext}'
+            )
 
     #add label to history
     history.VerticalLayout.addWidget(Temp)

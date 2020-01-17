@@ -10,10 +10,11 @@ class Popup:
     def __init__(self, Ui, Game, x_pos = 480, y_pos = 200, width=480, height=310):
         self.multiplier = 1
         self.Game=Game
+        self.Ui=Ui
         self.Player = Game.CurrentPlayer
         self.resources_to_thorw_out = list()
         self.upgraded_resources = list()
-        self.PopupWidget = QtWidgets.QWidget(Ui.Screen)
+        self.PopupWidget = QtWidgets.QWidget(self.Ui.Screen)
         self.PopupWidget.setGeometry(QtCore.QRect(x_pos, y_pos, width, height))
         self.PopupWidget.setObjectName('PopupWidget')
         self.PopupWidget.setStyleSheet(
@@ -21,15 +22,6 @@ class Popup:
                                     "background-color: #b38b79; "
                                     "border: 1px solid black;"
                                     "border-radius: 8"
-                                    "}"
-                                    "QPushButton{"
-                                    "background-color: #b19686; "
-                                    "border: 1px solid black;"
-                                    "border-radius: 8;"
-                                    "font-size: 12px;  font-weight: 500;"
-                                    "}"
-                                    "QPushButton:hover{"
-                                    "background-color: #e5e2d7;"
                                     "}"
                                     )
 
@@ -160,20 +152,20 @@ class Popup:
         self.multiplier = 1
         self.update_popup_widgets()
 
-    def configure_popup(self, popup_type, ClickedCardWidget, Ui):
-        self.ClickedCardWidget = ClickedCardWidget
+    def configure_popup(self, popup_type, ClickedCardWidget):
         self.popup_type = popup_type
-
-        #Check card distance to righd edge in its layout
-        #Player have pay 1 die for cadt between right edge and choosen card if he is taking playable card
-        #Player could get extra point for buying one of 2 closest do right edge Treasure cards
-        self.distance_to_right_edge = self.ClickedCardWidget.parent().parent().layout().count() - self.ClickedCardWidget.parent().parent().layout().indexOf(self.ClickedCardWidget.parent()) - 1
+        if ClickedCardWidget != 'none':
+            self.ClickedCardWidget = ClickedCardWidget
+            #Check card distance to righd edge in its layout
+            #Player have pay 1 die for cadt between right edge and choosen card if he is taking playable card
+            #Player could get extra point for buying one of 2 closest do right edge Treasure cards
+            self.distance_to_right_edge = self.ClickedCardWidget.parent().parent().layout().count() - self.ClickedCardWidget.parent().parent().layout().indexOf(self.ClickedCardWidget.parent()) - 1
 
         #Assing methods to buttons - 
         #We're assigning here (instead in __init__ because we're using Ui as argument which isnt aviable in Ui)
         self.Button1.disconnect()
         #Quick Note: self.Popupself.ClickedCardWidget is card inside popup, self.ClickedCardWidget is card which was clicked
-        self.Button1.clicked.connect(partial(self.action_confirmed, self.ClickedCardWidget.parent(), self.ClickedCardWidget, Ui, self.Game)) 
+        self.Button1.clicked.connect(partial(self.action_confirmed, self.ClickedCardWidget.parent(), self.ClickedCardWidget, self.Ui, self.Game)) 
         self.Button2.disconnect()
         self.Button2.clicked.connect(self.close_popup) 
 
@@ -201,7 +193,7 @@ class Popup:
             # self.HorizontalLayout.insertWidget(0, self.PopupCardWidget
 
             #Generate new card
-            self.PopupCardWidget = Ui.display_card(Card=self.ClickedCardWidget.Card, Target=self.HorizontalLayout, position_in_layout=0, for_popup=True)
+            self.PopupCardWidget = self.Ui.display_card(Card=self.ClickedCardWidget.Card, Target=self.HorizontalLayout, position_in_layout=0, for_popup=True)
             #self.PopupCardWidget.setFixedSize(120, 160)
 
             #Looks like its not needed but i am leaving this line "just in case"
@@ -213,46 +205,6 @@ class Popup:
 
 
     def update_popup_widgets(self):
-        #Then we're going to check self.popup_type and display desired right_side_widgets
-        # ###################################################################################
-        # #And finally, configuring for each popup type
-        # #Buyable Card picking
-        # if self.popup_type == 'BuyableStore':
-        #     for x in [0,1,2,3,4,5,10]:
-        #         pass
-        #         self.right_side_widgets_list[x].show()
-
-        # #Playable Card picking
-        # elif self.popup_type == 'PlayableStore':
-        #     #If Playable card do not require leaving dies this popup shouldn't be shown
-        #     for x in [0,1,6,7,10,11]:
-        #         self.right_side_widgets_list[x].show()
-        #     self.Button1.hide()
-
-        #     #Check if player have enough resources to this acction
-        #     if self.distance_to_right_edge <= len(self.Player.resources):
-        #         self.right_side_widgets_list[10].hide()
-        #     else:
-        #         self.right_side_widgets_list[11].hide()
-
-        # #Trade Card
-        # if self.popup_type == 'Trade':
-        #     for x in [0,1,2,3,4,5]:
-        #         self.right_side_widgets_list[x].show()
-
-        # #Upgrade
-        # elif self.popup_type == 'Upgrade':
-        #     #If Playable card do not require leaving dies this popup shouldn't be shown
-        #     for x in [0,1,8,9]:
-        #         self.right_side_widgets_list[x].show()
-
-        # #Harvesting card
-        # #This shouldn't require any popup
-
-        # #too_much_resources
-        # elif self.popup_type == 'too_much_resources':
-        #     pass
-
         distance_to_right_edge=self.distance_to_right_edge
         player_resources = {'k1':0, 'k2':0, 'k3':0, 'k4':0}
         for x in ['k1', 'k2', 'k3', 'k4']:
@@ -322,12 +274,13 @@ class Popup:
                 ]')
 
         #Extra counter for throwing out resources - This should be visible while picking Playable card
-        if self.popup_type == 'PlayableStore' or self.popup_type == 'Upgrade':
+        if self.popup_type == 'PlayableStore' or self.popup_type == 'Upgrade' or self.popup_type == 'too_much_resources':
             self.right_side_widgets_list[6].show()
             self.right_side_widgets_list[7].show()
             #Resources buttons shouln't be shown if player have choosen his resources
             if (self.popup_type == 'PlayableStore' and (len(self.resources_to_thorw_out) != distance_to_right_edge)) \
-            or (self.popup_type == 'Upgrade' and (len(self.resources_to_thorw_out) != int(self.ClickedCardWidget.Card.the_list[0][0]))):
+            or (self.popup_type == 'Upgrade' and (len(self.resources_to_thorw_out) != int(self.ClickedCardWidget.Card.the_list[0][0]))) \
+            or (self.popup_type == 'too_much_resources' and len(self.resources_to_thorw_out) != (len(self.Player.resources) - self.Game.resources_maximum)):
                 self.right_side_widgets_list[11].show()
             if self.popup_type == 'PlayableStore':
                 self.resources_buttons[3].show() #this button is aviable for throwing resources but hidden for upgrade
@@ -337,6 +290,10 @@ class Popup:
                     self.resources_buttons[3].hide() #this button is aviable for throwing resources but hidden for upgrade
                     self.right_side_widgets_list[6].setText(
                         f"You are upgrading ({len(self.resources_to_thorw_out)}/{self.ClickedCardWidget.Card.the_list[0][0]})")
+            if self.popup_type == 'too_much_resources':
+                self.resources_buttons[3].show() #this button is aviable for throwing resources but hidden for upgrade
+                self.right_side_widgets_list[6].setText(
+                    f"You are throwing out ({len(self.resources_to_thorw_out)}/{(len(self.Player.resources) - self.Game.resources_maximum)})")
             self.right_side_widgets_list[7].setText(
                 f'[ \
                 {self.resources_to_thorw_out.count("k1")} {img(file_name="k1", width=14, height=16)}| \
@@ -345,14 +302,15 @@ class Popup:
                 {self.resources_to_thorw_out.count("k4")} {img(file_name="k4", width=14, height=16)} \
                 ]')
 
-            self.right_side_widgets_list[10].setText('You have not enough resources!')
+        self.right_side_widgets_list[10].setText('You have not enough resources!')
 
         maintext={
                 "BuyableStore":f"You are buying a Treasure Card",
                 "PlayableStore":f"You are taking a Playable Card<br>Bonus resources: {self.ClickedCardWidget.BelowCardWidget_PlayableStore_Label.text()}",
                 "Harvest":"You are playing Harvesting Card",
                 "Upgrade":"You are playing Upgrade card",
-                "Trade":f"You are playing Trade card ({self.multiplier} times)"
+                "Trade":f"You are playing Trade card ({self.multiplier} times)",
+                "too_much_resources":f"You have too much resources!"
                 }
         self.MainText.setText(maintext[self.popup_type])
 
@@ -381,4 +339,12 @@ class Popup:
                 if len(self.resources_to_thorw_out) == int(self.ClickedCardWidget.Card.the_list[0][0]):
                     self.Button1.show()
                     self.right_side_widgets_list[11].hide()
+
+        if self.popup_type == 'too_much_resources':
+            if self.Player.resources.count(resource_type) > self.resources_to_thorw_out.count(resource_type):
+                self.resources_to_thorw_out.append(resource_type)
+                if len(self.resources_to_thorw_out) == (len(self.Player.resources) - self.Game.resources_maximum):
+                    self.Button1.show()
+                    self.right_side_widgets_list[11].hide()
+
         self.update_popup_widgets()

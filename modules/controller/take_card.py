@@ -40,7 +40,7 @@ def press_the_card(ClickedWholeWidget, ClickedCardWidget, Ui, Game, Popup, event
     #In case Player press another card while popup is visible
     Popup.close_popup()
 
-    Popup.configure_popup(popup_type=popup_type, ClickedCardWidget=ClickedCardWidget, Ui=Ui)
+    Popup.configure_popup(popup_type=popup_type, ClickedCardWidget=ClickedCardWidget)
 
     if check_if_popup_needed(popup_type=popup_type, distance_to_right_edge=Popup.distance_to_right_edge):
         #Show popup

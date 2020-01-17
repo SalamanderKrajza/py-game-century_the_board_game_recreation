@@ -90,17 +90,6 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
     MyCardWidget.BelowCardWidget_PlayerHand = QtWidgets.QWidget()
     MyCardWidget.BelowCardWidget_PlayerHand.setObjectName('BelowCard_PlayerHand')
     MyCardWidget.BelowCardWidget_PlayerHand.setFixedHeight(40)
-    MyCardWidget.BelowCardWidget_PlayerHand.setStyleSheet(
-                                    "QPushButton{"
-                                    "background-color: #b19686; "
-                                    "border: 1px solid black;"
-                                    "border-radius: 8;"
-                                    "font-size: 12px;  font-weight: 500;"
-                                    "}"
-                                    "QPushButton:hover{"
-                                    "background-color: #e5e2d7;"
-                                    "}"
-                                    )
     WholeVerticalLayout.addWidget(MyCardWidget.BelowCardWidget_PlayerHand)
     #Add layout for extra buttons assigned to card
     BelowCardLayoutForButtons_PlayerHand = QtWidgets.QHBoxLayout(MyCardWidget.BelowCardWidget_PlayerHand)

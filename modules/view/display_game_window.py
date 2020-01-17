@@ -13,4 +13,14 @@ def display_game_window(self):
         #"#test{border: 1px solid #F00}" 
         "#MyGame_Screen{background-image: url(images/board2.png)}"
         #"#MyGame_Screen{background-color: #b38b79"
+        "QPushButton{"
+        "background-color: #b19686; "
+        "border: 1px solid black;"
+        "border-radius: 8;"
+        "font-size: 12px;  font-weight: 500;"
+        "}"
+        "QPushButton:hover{"
+        "background-color: #e5e2d7;"
+        "}"
+
         )

@@ -56,7 +56,7 @@ def player_box(self, Player, x_pos, y_pos, width=240, height=130):
     #ROW4 STORAGE: [amount/maximum] (storage_points)
     SingleLine(row=4, style=styles['smaller_label'], \
         left_label_content='STORAGE:', \
-        right_label_content=f'[{Player.resources_count:02}/10] ({Player.resources_points} POINTS)')
+        right_label_content=f'[{Player.resources_count:02}/{Player.resources_count:02}] ({Player.resources_points} POINTS)')
 
     #ROW5 images of resources
     TempLabel = QtWidgets.QLabel(f'[ \
