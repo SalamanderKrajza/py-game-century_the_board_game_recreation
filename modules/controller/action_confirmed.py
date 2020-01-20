@@ -175,6 +175,8 @@ def action_confirmed(self, ClickedWholeWidget, ClickedCardWidget, Ui, Game):
     #Recalculate total player points
     Player.total_points = Player.resources_points + Player.riches_points + Player.coins_points
 
+    #Add new history note after action
+    self.history_note_after_action(ClickedCardWidget=ClickedCardWidget, income=income, cost=cost)
 
     #Update displayed data
     update_player_box(Game=Game, Ui=Ui, Player=Player)
@@ -185,24 +187,27 @@ def action_confirmed(self, ClickedWholeWidget, ClickedCardWidget, Ui, Game):
     #Before end of the turn we should check if player hasn't surpass maximum amount of riches
     self.check_player_riches()
 
-    #Trigger end of the turn
-    self.end_of_the_turn(ClickedCardWidget=ClickedCardWidget, income=income, cost=cost)
+    #Change turn number
+    self.Game.turn_no += 1
+    #Change player
+    # not implemented yet 
 
 def check_player_resources(self):
     """Before end of the turn we have to check if player have not surpass maximum resource limit"""
     if self.Game.CurrentPlayer.resources_count > self.Game.resources_maximum:
         self.configure_popup(popup_type='too_much_resources', ClickedCardWidget='none')
         self.display_popup()
-        print('Gracz ma za duzo kostek!!')
     pass
 
 def check_player_riches(self):
     """Before end of the turn we have to check if player have not surpass maximum riches limit"""
+    if self.Game.CurrentPlayer.riches_count >= self.Game.riches_maximum:
+        print('Game is finished!')
+        self.Ui.game_record(update=True, previous_record = self.Game.record)
     pass
 
 #This is also part of the popup class
-def end_of_the_turn(self, ClickedCardWidget='none', income=list(), cost=list()):
-    self.Game.turn_no += 1 
+def history_note_after_action(self, ClickedCardWidget='none', income=list(), cost=list()):
     display_income = False if len(income)<1 else f'[{income.count("k1")}{img("k1")}, {income.count("k2")}{img("k2")}, {income.count("k3")}{img("k3")}, {income.count("k4")}{img("k4")}]'
     display_cost = False if len(cost)<1 else f'[{cost.count("k1")}{img("k1")}, {cost.count("k2")}{img("k2")}, {cost.count("k3")}{img("k3")}, {cost.count("k4")}{img("k4")}]'
     #We re adding some coloring to make notes easier to read. 
@@ -228,7 +233,7 @@ def end_of_the_turn(self, ClickedCardWidget='none', income=list(), cost=list()):
             f'has buyed {c1}[Buyable]{c2} card.<br>'
             f'Player paid {display_cost} for this card.',
         'too_much_resources':
-            f'has throwed out some resources'
+            f'has throwed out {display_cost} because he had too many resources'
         
         
     }

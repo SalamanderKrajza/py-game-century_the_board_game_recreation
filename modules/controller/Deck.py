@@ -17,9 +17,6 @@ class Deck:
         with open(path, newline='') as csvfile:
             self.cards = list(csv.reader(csvfile, delimiter=';')) #I've removed "quotechar='|'" 
         
-        if source_file=='Buyable':
-            pass
-
         #Converting all strings into the Card objects
         for x in range(0, len(self.cards)):
             if self.cards[x][1] == "Treasure": #Treasure card are loaded from different file and need to be readed in different way

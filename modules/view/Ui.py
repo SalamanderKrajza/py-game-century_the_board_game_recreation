@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from functools import partial
-import datetime
 
 from modules.view.ScrollBox import ScrollBox
 from modules.view.img import img
@@ -18,6 +17,7 @@ class Ui:
     from modules.view.add_text_label import add_text_label
     from modules.view.player_box import player_box
     from modules.controller.cards_actions import move_card
+    from modules.controller.game_record import game_record
     """Class responsible for management of graphic interface of Game"""
     def __init__(self, Game):
         self.Game = Game
@@ -81,10 +81,22 @@ class Ui:
         Rest_Button.resize(140, 40)
         Rest_Button.clicked.connect(partial(rest, Game, self))
 
+        #We're crating transparet poup fo player will be unable to press outsite dhe popup when to close it (when he have too much resources)
+        self.Blocker_Widget = QtWidgets.QWidget(self.Screen)
+        self.Blocker_Widget.setStyleSheet('background-color: transparent')
+        self.Blocker_Widget.setFixedSize(1400, 800)
+        self.Blocker_Widget.hide()
+
         #show screen
         self.Screen.show()
 
         #Make note about initialization
         add_to_history(Ui=self, HTMLtext='Ui has been created')
+
+        #Read current game record and print it to history
+        Game.record = self.game_record(update=False)
+
+        #Display current record
+        self.Game.turn_no += 1
 
 

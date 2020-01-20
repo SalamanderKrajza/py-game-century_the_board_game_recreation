@@ -12,6 +12,8 @@ def check_if_popup_needed(popup_type, distance_to_right_edge=99):
         #If we're buying Playable card we need to check how close it is to end of the list
         if not distance_to_right_edge:
             return False
+    if popup_type == 'too_much_resources':
+        return True
 
     return True
 

@@ -4,6 +4,7 @@ from modules.view.img import img
 import datetime
 
 def add_to_history(Ui, who='Game', HTMLtext=''):
+    """method which adding new note in history box."""
     history = Ui.history
     Game = Ui.Game 
     #get current time

@@ -19,7 +19,7 @@ class Game:
                 self.players.append(Player(name=f'player{x+1}', no=x)) #It could be any names but for now we're creating players 1, 2 etc
 
             #Define some game attributes
-            self.riches_maximum = 9
+            self.riches_maximum = 1
             self.resources_maximum = 10
             self.gold_coins_counter = 10 
             self.silver_coins_counter = 10

@@ -6,7 +6,7 @@ from functools import partial
 
 class Popup:
 
-    from modules.controller.action_confirmed import action_confirmed, check_player_resources, check_player_riches, end_of_the_turn
+    from modules.controller.action_confirmed import action_confirmed, check_player_resources, check_player_riches, history_note_after_action
     def __init__(self, Ui, Game, x_pos = 480, y_pos = 200, width=480, height=310):
         self.multiplier = 1
         self.Game=Game
@@ -146,6 +146,9 @@ class Popup:
         self.resources_to_thorw_out = list()
         self.upgraded_resources = list()
         self.PopupWidget.hide()
+        #In case player had "too much resources" popup, we're showing "cancel" button and hidding blocker again
+        self.Button2.show()
+        self.Ui.Blocker_Widget.hide()
 
     def display_popup(self):
         self.PopupWidget.show()
@@ -198,6 +201,10 @@ class Popup:
 
             #Looks like its not needed but i am leaving this line "just in case"
             self.PopupCardWidget.show()
+        else:
+            #If we are dealing with too_much_resources popup we should block possibility to press outside popup
+            self.Ui.Blocker_Widget.show()
+            self.Button2.hide()
 
         #Then we should update labels
         self.update_popup_widgets()
