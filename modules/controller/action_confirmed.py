@@ -42,9 +42,9 @@ def action_confirmed(self, ClickedWholeWidget, ClickedCardWidget, Ui, Game):
         Player.coins_points = 3 * Player.coins_gold + 1 * Player.coins_silver
 
         #Remove Card cost from player resources after buying
-        cost = ClickedCardWidget.Card.the_list[0]
+        cost = ClickedCardWidget.Card.input_resources_list
         income = list()
-        for x in ClickedCardWidget.Card.the_list[0]:
+        for x in ClickedCardWidget.Card.input_resources_list:
             if x != '':
                 Player.resources.remove(x)
 
@@ -118,22 +118,22 @@ def action_confirmed(self, ClickedWholeWidget, ClickedCardWidget, Ui, Game):
         Ui.PlayerHand.ScrollAreaWidgetContents.resize(Ui.PlayerHand.ScrollAreaWidgetContents.width()+130, \
                                                     Ui.PlayerHand.ScrollAreaWidgetContents.height())
     if self.popup_type == 'Harvest':
-        income = ClickedCardWidget.Card.the_list[0]
+        income = ClickedCardWidget.Card.input_resources_list
         cost = ''
-        for x in ClickedCardWidget.Card.the_list[0]:
+        for x in ClickedCardWidget.Card.input_resources_list:
             if x != '':
                 Player.resources.append(x)
 
     if self.popup_type == 'Trade':
-        income = ClickedCardWidget.Card.the_list[1]*self.multiplier
-        cost = ClickedCardWidget.Card.the_list[0]*self.multiplier
+        income = ClickedCardWidget.Card.output_resources_list*self.multiplier
+        cost = ClickedCardWidget.Card.input_resources_list*self.multiplier
         #Repeat Y times (Y is based on multiplier choosen by player)
         for y in range(0, self.multiplier):
             #Remove card cost from player resources
-            for x in ClickedCardWidget.Card.the_list[0]:
+            for x in ClickedCardWidget.Card.input_resources_list:
                 if x != '':
                     Player.resources.remove(x)
-            for x in ClickedCardWidget.Card.the_list[1]:
+            for x in ClickedCardWidget.Card.output_resources_list:
                 #Add card income to player resources
                 if x != '':
                     Player.resources.append(x)
@@ -241,9 +241,9 @@ def history_note_after_action(self, ClickedCardWidget='none', income=list(), cos
     add_to_history(Ui=self.Ui, who=self.Game.CurrentPlayer.name, HTMLtext=content)
 
     pass
-    # for Player in self.Game.players:
-    #     print(f'Current player is: {Player.no}')
-    #     print(f'next player is: {next(Player).no}')
+    # for Player in self.Game.players_list:
+    #     print(f'Current player is: {Player.player_number}')
+    #     print(f'next player is: {next(Player).player_number}')
 
 
 
@@ -259,7 +259,7 @@ def update_player_box(Game, Ui, Player):
         {Player.resources.count("k4")} {img(file_name="k4", width=14, height=16)} ]'}                    
 
     #As all players have the objects with the same name inside playerbox, we have to find their box first
-    CurrentPlayerBox = Ui.Screen.findChild(QtWidgets.QWidget, f'player_{Player.no}_box')
+    CurrentPlayerBox = Ui.Screen.findChild(QtWidgets.QWidget, f'player_{Player.player_number}_box')
 
     for x in range(1,6):
         #as we know CurrentPlayerBox, we now can search for specified row

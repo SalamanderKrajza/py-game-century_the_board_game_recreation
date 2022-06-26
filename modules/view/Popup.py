@@ -235,10 +235,10 @@ class Popup:
         resources_income = {'k1':0, 'k2':0, 'k3':0, 'k4':0}
         for x in ['k1', 'k2', 'k3', 'k4']:
             if self.popup_type == 'BuyableStore':
-                resources_cost[x] = self.ClickedCardWidget.Card.the_list[0].count(x)
+                resources_cost[x] = self.ClickedCardWidget.Card.input_resources_list.count(x)
             elif self.popup_type == 'Trade':
-                resources_cost[x] = self.ClickedCardWidget.Card.the_list[0].count(x) * self.multiplier
-                resources_income[x] = self.ClickedCardWidget.Card.the_list[1].count(x) * self.multiplier
+                resources_cost[x] = self.ClickedCardWidget.Card.input_resources_list.count(x) * self.multiplier
+                resources_income[x] = self.ClickedCardWidget.Card.output_resources_list.count(x) * self.multiplier
         self.right_side_widgets_list[2].setText("It costs:")
         self.right_side_widgets_list[3].setText(
             f'[ \
@@ -286,7 +286,7 @@ class Popup:
             self.right_side_widgets_list[7].show()
             #Resources buttons shouln't be shown if player have choosen his resources
             if (self.popup_type == 'PlayableStore' and (len(self.resources_to_thorw_out) != distance_to_right_edge)) \
-            or (self.popup_type == 'Upgrade' and (len(self.resources_to_thorw_out) != int(self.ClickedCardWidget.Card.the_list[0][0]))) \
+            or (self.popup_type == 'Upgrade' and (len(self.resources_to_thorw_out) != int(self.ClickedCardWidget.Card.input_resources_list[0]))) \
             or (self.popup_type == 'too_much_resources' and len(self.resources_to_thorw_out) != (len(self.Player.resources) - self.Game.resources_maximum)):
                 self.right_side_widgets_list[11].show()
             if self.popup_type == 'PlayableStore':
@@ -296,7 +296,7 @@ class Popup:
             if self.popup_type == 'Upgrade':
                     self.resources_buttons[3].hide() #this button is aviable for throwing resources but hidden for upgrade
                     self.right_side_widgets_list[6].setText(
-                        f"You are upgrading ({len(self.resources_to_thorw_out)}/{self.ClickedCardWidget.Card.the_list[0][0]})")
+                        f"You are upgrading ({len(self.resources_to_thorw_out)}/{self.ClickedCardWidget.Card.input_resources_list[0]})")
             if self.popup_type == 'too_much_resources':
                 self.resources_buttons[3].show() #this button is aviable for throwing resources but hidden for upgrade
                 self.right_side_widgets_list[6].setText(
@@ -342,8 +342,7 @@ class Popup:
                 upgraded ={'k1':'k2', 'k2':'k3', 'k3':'k4'}
                 self.upgraded_resources.append(upgraded[resource_type])
                 
-                print(self.ClickedCardWidget.Card.the_list[0][0])
-                if len(self.resources_to_thorw_out) == int(self.ClickedCardWidget.Card.the_list[0][0]):
+                if len(self.resources_to_thorw_out) == int(self.ClickedCardWidget.Card.input_resources_list[0]):
                     self.Button1.show()
                     self.right_side_widgets_list[11].hide()
 

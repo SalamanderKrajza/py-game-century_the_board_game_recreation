@@ -6,10 +6,10 @@ from modules.view.img import img
 def player_box(self, Player, x_pos, y_pos, width=240, height=130):
     """Method used for adding area which displays Player points and resources"""
     PlayerBoxWidget = QtWidgets.QWidget(self.Screen)
-    PlayerBoxWidget.setObjectName(f'player_{Player.no}_box')
+    PlayerBoxWidget.setObjectName(f'player_{Player.player_number}_box')
     PlayerBoxWidget.setGeometry(QtCore.QRect(x_pos, y_pos, width, height))
     PlayerBoxWidget.setStyleSheet(
-        f"#player_{Player.no}_box{{background-color: #b38b79; border: 1px solid black}}"
+        f"#player_{Player.player_number}_box{{background-color: #b38b79; border: 1px solid black}}"
     )
 
     styles = {"bigger_label":"font-size:17px; font-weight: bold; color: black", \

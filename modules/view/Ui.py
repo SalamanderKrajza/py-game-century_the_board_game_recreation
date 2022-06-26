@@ -26,12 +26,12 @@ class Ui:
         self.display_game_window()
 
         #Show players boxes
-        self.player_box(Player=self.Game.players[0] ,x_pos=10, y_pos=565)
+        self.player_box(Player=self.Game.players_list[0] ,x_pos=10, y_pos=565)
 
-        for x in Game.players:
+        for x in Game.players_list:
             try:
-                if x.no == 0: continue
-                self.player_box(x ,x_pos=1112-(x.no-1)*262, y_pos=10)
+                if x.player_number == 0: continue
+                self.player_box(x ,x_pos=1112-(x.player_number-1)*262, y_pos=10)
 
             except:
                 print ('There was fail with displaying player box. Probably one of players was not created.')
@@ -48,21 +48,21 @@ class Ui:
             x_pos=308, y_pos=565, height=210, prefix='PlayerHand', scrollbox_type='PlayerHand')
 
         #Display cards in storages        
-        for Card in Game.playable_store_cards:
+        for Card in Game.playable_store_cards_list:
             self.display_card(Card=Card, Target=self.PlayableStore.HorizontalLayout)
 
-        for Card in Game.buyable_store_cards:
+        for Card in Game.buyable_store_cards_list:
             self.display_card(Card=Card, Target=self.BuyableStore.HorizontalLayout)
 
         #Display cards in player hand
-        for Card in Game.players[0].player_hand:
+        for Card in Game.players_list[0].player_hand:
             self.display_card(Card=Card, Target=self.PlayerHand.HorizontalLayout)
         #Resize playerhand scrollbox (this have not fixed size)
-        self.PlayerHand.ScrollAreaWidgetContents.resize(130*len(Game.players[0].player_hand), self.PlayerHand.ScrollAreaWidgetContents.height())
+        self.PlayerHand.ScrollAreaWidgetContents.resize(130*len(Game.players_list[0].player_hand), self.PlayerHand.ScrollAreaWidgetContents.height())
 
         #Display "Current Player"
         self.add_text_label(content='Current turn:', x_pos=10, y_pos=5)
-        self.add_text_label(content=f'{self.Game.players[self.Game.current_player_no].name}', x_pos=10, y_pos=20)
+        self.add_text_label(content=f'{self.Game.players_list[self.Game.current_player_no].name}', x_pos=10, y_pos=20)
         
         #Display history box
         self.add_text_label(content='History:', x_pos=10, y_pos=125)

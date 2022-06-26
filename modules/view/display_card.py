@@ -148,17 +148,18 @@ def display_card(self, Card, Target, position_in_layout=0, for_popup=False):
 def fill_grid(self, Card, descriptions, CardGrid):
         if Card.card_type == 'Trade' or Card.card_type == 'Harvest':
             for row in range (0, 5):
-                for column in range (0,2):
+                for column_to_be_printed in range(0,2):
+                    desired_list = [Card.input_resources_list, Card.output_resources_list][column_to_be_printed]
                     #Add all inputs and outputs to the grid
                     Element = QtWidgets.QLabel()
                     Element.setText = ""
-                    if Card.the_list[column][row] != "":
+                    if desired_list[row] != "":
                         Element.setStyleSheet(
-                            f"background-image: url(images/{Card.the_list[column][row]}.png);"
+                            f"background-image: url(images/{desired_list[row]}.png);"
                             "background-repeat: none; "
                             "background-position: center;"
                             )
-                    CardGrid.addWidget(Element, row, column)
+                    CardGrid.addWidget(Element, row, column_to_be_printed)
 
             #Add description
             Description = QLabel(descriptions[Card.card_type])
@@ -178,7 +179,7 @@ def fill_grid(self, Card, descriptions, CardGrid):
             #Display the number
             Element = QtWidgets.QLabel()
             Element.setFixedSize(20, 20)
-            Element.setText(f'{Card.the_list[0][0]}')
+            Element.setText(f'{Card.input_resources_list[0]}')
             Element.setStyleSheet(
                 "font-size:12px; font-weight: bold;"
                 "padding-left: 5px;"
@@ -233,9 +234,9 @@ def fill_grid(self, Card, descriptions, CardGrid):
                 Element = QtWidgets.QLabel('')
                 Element.setFixedWidth(16)
                 Element.setObjectName("bigger_labels")
-                if Card.the_list[0][x]!='':
+                if Card.input_resources_list[x]!='':
                     Element.setStyleSheet(
-                        f"background-image: url(images/{Card.the_list[0][x]}.png);"
+                        f"background-image: url(images/{Card.input_resources_list[x]}.png);"
                         "background-repeat: none; "
                         "background-position: center;"
                     )
