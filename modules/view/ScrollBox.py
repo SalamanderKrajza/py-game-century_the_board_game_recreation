@@ -16,6 +16,7 @@ class ScrollBox:
             f"#{prefix}-ScrollArea{{background-color: #b38b79; border: 1px solid black}}"
             "#ScrollAreaWidgetContents{background-color: #b38b79; }"
             )
+
         #Create inner area
         self.ScrollAreaWidgetContents = QtWidgets.QWidget()
         self.ScrollAreaWidgetContents.setObjectName("ScrollAreaWidgetContents")
@@ -37,3 +38,7 @@ class ScrollBox:
 
         #Resize innerContent
         self.ScrollAreaWidgetContents.resize(130*cards_cnt-4, height-4)
+
+    def resize_player_hand_scroll_area(self, cards_cnt):
+        """Resize playerhand scrollbox (this have not fixed size but changes with amount of cards that player has)"""
+        self.ScrollAreaWidgetContents.resize(130*len(cards_cnt), self.ScrollAreaWidgetContents.height())
