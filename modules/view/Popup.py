@@ -5,39 +5,47 @@ from modules.view.img import img
 from functools import partial
 
 class Popup:
+    def create_popup_widget(self, x_pos, y_pos, width, height):
+        from modules.view.styles import popup_styles
+        self.PopupWidget = QtWidgets.QWidget(self.Ui.Screen)
+        self.PopupWidget.setGeometry(QtCore.QRect(x_pos, y_pos, width, height))
+        self.PopupWidget.setObjectName('PopupWidget')
+        self.PopupWidget.setStyleSheet(popup_styles)
+
+    def add_vertical_layout_to_pupup_widget(self):
+        self.VierticalLayout = QtWidgets.QVBoxLayout(self.PopupWidget)
+
+    def add_label_for_maintext_to_popup(self):
+        from modules.view.styles import popup_miantext_styles
+        self.MainText = QtWidgets.QLabel('MainTextLabel')
+        self.MainText.setStyleSheet(popup_miantext_styles)
+        self.MainText.setFixedHeight(50)
+        self.VierticalLayout.addWidget(self.MainText)
+        self.VierticalLayout.setContentsMargins(20,10,10,10) #left, top, right, bottom
+
+    def create_popup_layout(self):
+        """
+        Creates 2 columns layout - 
+        """
+        #Prepare horizontal layout for card image (LEFT SIDE) and some text (RIGHT SIDE)
+        self.HorizontalLayout = QtWidgets.QHBoxLayout()
+        self.VierticalLayout.addLayout(self.HorizontalLayout)
 
     from modules.controller.action_confirmed import action_confirmed, check_player_resources, check_player_riches, history_note_after_action
     def __init__(self, Ui, Game, x_pos = 480, y_pos = 200, width=480, height=310):
-        self.multiplier = 1
+        self.multiplier = 1 #Used with trade cards - if you wanna trade cards multiple times in single trade action
         self.Game=Game
         self.Ui=Ui
         self.Player = Game.CurrentPlayer
         self.resources_to_thorw_out = list()
         self.upgraded_resources = list()
-        self.PopupWidget = QtWidgets.QWidget(self.Ui.Screen)
-        self.PopupWidget.setGeometry(QtCore.QRect(x_pos, y_pos, width, height))
-        self.PopupWidget.setObjectName('PopupWidget')
-        self.PopupWidget.setStyleSheet(
-                                    "#PopupWidget{"
-                                    "background-color: #b38b79; "
-                                    "border: 1px solid black;"
-                                    "border-radius: 8"
-                                    "}"
-                                    )
 
-        #Prepare vertical layout for popup
-        self.VierticalLayout = QtWidgets.QVBoxLayout(self.PopupWidget)
+        self.create_popup_widget(x_pos, y_pos, width, height)
+        self.add_vertical_layout_to_pupup_widget()
+        self.add_label_for_maintext_to_popup()
 
-        #Prepare label for maintext
-        self.MainText = QtWidgets.QLabel('MainTextLabel')
-        self.MainText.setStyleSheet("font-size: 18px;  font-weight: 450;")
-        self.MainText.setFixedHeight(50)
-        self.VierticalLayout.addWidget(self.MainText)
-        self.VierticalLayout.setContentsMargins(20,10,10,10) #left, top, right, bottom
+        self.create_popup_layout()
 
-        #Prepare horizontal layout for card image (LEFT SIDE) and some text (RIGHT SIDE)
-        self.HorizontalLayout = QtWidgets.QHBoxLayout()
-        self.VierticalLayout.addLayout(self.HorizontalLayout)
         
         #For test we're adding some widget to simulate card image
         self.PopupCardWidget = QtWidgets.QWidget()

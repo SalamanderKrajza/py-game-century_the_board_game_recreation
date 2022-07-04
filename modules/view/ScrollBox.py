@@ -4,19 +4,32 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class ScrollBox:
     """Class which helps creating new ScrollBoxes on the gamescreen. It also keeps all related properties"""
     def __init__(self, parentWidget, cards_cnt, x_pos, y_pos, height, prefix, scrollbox_type='standard'):
-        extra_space_for_scrollbar = 0 + (scrollbox_type == 'PlayerHand')*15
-        extra_space_for_scrollbar2 = 0 + (scrollbox_type == 'history')*15
+        self.geometry_dict = {
+            'standard':{
+                'width': 130 * cards_cnt + 2,
+                'height': height + 2,
+            },
+            'PlayerHand':{
+                'width': 130 * cards_cnt + 2,
+                'height': height + 2 + 15,
+            },
+            'history':{
+                'width': 130 * cards_cnt + 2 + 15, 
+                'height': height + 2,
+            }
+        }
+        self.create_outer_scrollbox_area(parentWidget, cards_cnt, x_pos, y_pos, height, prefix, scrollbox_type)
+        self.create_inner_scrollbox_area(cards_cnt, height, scrollbox_type)
 
-        #Create outer area
+    def create_outer_scrollbox_area(self, parentWidget, cards_cnt, x_pos, y_pos, height, prefix, scrollbox_type):
         self.ScrollArea = QtWidgets.QScrollArea(parentWidget)
-        self.ScrollArea.setGeometry(QtCore.QRect(x_pos, y_pos, 130*cards_cnt+2+extra_space_for_scrollbar2, height+2+extra_space_for_scrollbar))
+        self.ScrollArea.setGeometry(QtCore.QRect(
+            x_pos, y_pos, self.geometry_dict[scrollbox_type]['width'], self.geometry_dict[scrollbox_type]['height']))
         self.ScrollArea.setObjectName(f"{prefix}-ScrollArea")
+        from modules.view.styles import scrollbox_styles
+        self.ScrollArea.setStyleSheet(f"#{prefix}-{scrollbox_styles}")
 
-        self.ScrollArea.setStyleSheet(
-            f"#{prefix}-ScrollArea{{background-color: #b38b79; border: 1px solid black}}"
-            "#ScrollAreaWidgetContents{background-color: #b38b79; }"
-            )
-
+    def create_inner_scrollbox_area(self, cards_cnt, height, scrollbox_type):
         #Create inner area
         self.ScrollAreaWidgetContents = QtWidgets.QWidget()
         self.ScrollAreaWidgetContents.setObjectName("ScrollAreaWidgetContents")
@@ -35,9 +48,8 @@ class ScrollBox:
             self.HorizontalLayout.setContentsMargins(0,0,0,0)
             self.ScrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         
-
         #Resize innerContent
-        self.ScrollAreaWidgetContents.resize(130*cards_cnt-4, height-4)
+        self.ScrollAreaWidgetContents.resize(130 * cards_cnt -4, height-4)
 
     def resize_player_hand_scroll_area(self, cards_cnt):
         """Resize playerhand scrollbox (this have not fixed size but changes with amount of cards that player has)"""

@@ -76,3 +76,6 @@ class Game:
         self.current_player_no = self.players_list[0].player_number
         self.CurrentPlayer = self.players_list[0]
         self.turn_no = 0
+
+    def increase_current_turn_id(self):
+        self.turn_no += 1

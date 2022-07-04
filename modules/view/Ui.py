@@ -17,7 +17,7 @@ class Ui:
     from modules.view.add_text_label import add_text_label
     from modules.view.player_box import create_player_box, fill_playerbox_with_content
     from modules.controller.cards_actions import move_card
-    from modules.controller.game_record import game_record
+    from modules.controller.game_record import game_record, get_game_record_from_file, generate_record_announcement
     """Class responsible for management of graphic interface of Game"""
     def __init__(self, Game):
         self.Game = Game
@@ -51,30 +51,21 @@ class Ui:
         self.display_history_box()
         self.display_coins_info()
         self.display_buttons_for_player_actions()
+        self.create_blocker_widget()
 
-
-        #We're crating transparet poup fo player will be unable to press outsite dhe popup when to close it (when he have too much resources)
-        self.Blocker_Widget = QtWidgets.QWidget(self.Screen)
-        self.Blocker_Widget.setStyleSheet('background-color: transparent')
-        self.Blocker_Widget.setFixedSize(1400, 800)
-        self.Blocker_Widget.hide()
-
-        #show screen
         self.Screen.show()
-
-        #Make note about initialization
+        
         add_to_history(Ui=self, HTMLtext='Ui has been created')
+        self.get_game_record_from_file()
+        record_announcement = self.generate_record_announcement()
+        add_to_history(Ui=self, HTMLtext=record_announcement)
 
-        #Read current game record and print it to history
-        Game.record = self.game_record(update=False)
-
-        #Display current record
-        self.Game.turn_no += 1
+        self.Game.increase_current_turn_id()
 
 
     def define_css_rules_to_style_elements(self):
-        self.styles = {"bigger_label":"font-size:17px; font-weight: bold; color: black", \
-                "smaller_label":"font-size:13px; font-weight: bold; color: black"}
+        from modules.view.styles import ui_styles
+        self.styles = ui_styles
 
     def display_current_player_name(self):
         """
@@ -115,3 +106,14 @@ class Ui:
         Rest_Button.move(10, 750)
         Rest_Button.resize(140, 40)
         Rest_Button.clicked.connect(partial(rest, self.Game, self))
+
+    def create_blocker_widget(self):
+        """
+        To prevent possibility to get access to different object when some popup is visible 'n
+        We are displaying transparet object right below popup which catch all
+        clicks which soulnd't be passed to the other objects below active widget
+        """
+        self.Blocker_Widget = QtWidgets.QWidget(self.Screen)
+        self.Blocker_Widget.setStyleSheet('background-color: transparent')
+        self.Blocker_Widget.setFixedSize(1400, 800)
+        self.Blocker_Widget.hide()

@@ -23,3 +23,16 @@ def game_record(self, previous_record = 999, update=False):
 
     RecordFile.close()
     return(previous_record)
+
+
+def get_game_record_from_file(self):
+    with open(f'externaldata/record.txt', newline='', mode='rt') as record_file:
+        self.record = record_file.read().split(";")
+
+def generate_record_announcement(self):
+    c1 = '<font color=\"#600\">' 
+    c2 = '</font>'
+    return (
+        f'Your goal is to get {c1}{self.Game.riches_maximum} riches{c2} as soon as possible<br>'
+        f'Current record is set at {c1}{self.record[2]}{c2} turns by {c1}{self.record[3]}{c2} at {self.record[0]} {self.record[1]}.'
+        )
