@@ -13,23 +13,61 @@ class Popup:
         self.PopupWidget.setStyleSheet(popup_styles)
 
     def add_vertical_layout_to_pupup_widget(self):
-        self.VierticalLayout = QtWidgets.QVBoxLayout(self.PopupWidget)
+        """
+        Vertical layout will contain areas
+        1) PopupTitle - title of popup
+        2) PopupMainAreaHorizontalLayout - 2-side horizontal layout
+            - with card image
+            - with resources/smallbuttons
+        3) action buttons (cancel / ok)
+        """
+        self.PopupVierticalLayout = QtWidgets.QVBoxLayout(self.PopupWidget)
 
-    def add_label_for_maintext_to_popup(self):
+    def add_label_for_title_to_popup(self):
+        """
+        Adds first area of popup layout - area with title
+        """
         from modules.view.styles import popup_miantext_styles
-        self.MainText = QtWidgets.QLabel('MainTextLabel')
-        self.MainText.setStyleSheet(popup_miantext_styles)
-        self.MainText.setFixedHeight(50)
-        self.VierticalLayout.addWidget(self.MainText)
-        self.VierticalLayout.setContentsMargins(20,10,10,10) #left, top, right, bottom
+        self.PopupTitle = QtWidgets.QLabel('TitleLabel')
+        self.PopupTitle.setStyleSheet(popup_miantext_styles)
+        self.PopupTitle.setFixedHeight(50)
+        self.PopupVierticalLayout.addWidget(self.PopupTitle)
+        self.PopupVierticalLayout.setContentsMargins(20,10,10,10) #left, top, right, bottom
 
-    def create_popup_layout(self):
+    def add_main_area_to_popup(self):
         """
-        Creates 2 columns layout - 
+        Adds second area of popup layout - area main area
+        This area contains horizontal layout with 2 columns\n
+        LEFT-SIDE will contain image of clicked card \n
+        RIGHT-SIDE will contain resources and buttons related with them
         """
-        #Prepare horizontal layout for card image (LEFT SIDE) and some text (RIGHT SIDE)
-        self.HorizontalLayout = QtWidgets.QHBoxLayout()
-        self.VierticalLayout.addLayout(self.HorizontalLayout)
+        #Prepare horizontal layout for main popup area
+        self.PopupMainAreaHorizontalLayout = QtWidgets.QHBoxLayout()
+        self.PopupVierticalLayout.addLayout(self.PopupMainAreaHorizontalLayout)
+
+        #LEFT SIDE is single widget so we dont create area here (widget will be appended to PopupMainAreaHorizontalLayout)
+
+        #Add RIGHT-SIDE area layout
+        self.VierticalLayout2 = QtWidgets.QVBoxLayout()
+        self.PopupMainAreaHorizontalLayout.insertLayout(1, self.VierticalLayout2) #index=1 means right side (0 is for image)
+
+    def create_card_placeholder(self):
+        """
+        This is content of LEFT-SIDE of main-widget area \n\n
+        Placeholder is needed to let other methods works before desired card is generated \n
+        Final version of widged uses image of clicked cards (otherwie hides PopupCardWidget) \n
+        This one just creates object with shape of card as half-way substitute
+        """
+        self.PopupCardWidget = QtWidgets.QWidget()
+        self.PopupCardWidget.setObjectName('CardWidgetTemplate')
+        self.PopupCardWidget.setFixedSize(120, 160)
+        from modules.view.styles import card_placeholder
+        self.PopupCardWidget.setStyleSheet(card_placeholder)
+        self.PopupMainAreaHorizontalLayout.insertWidget(0, self.PopupCardWidget)
+        
+    def add_right_side_widgets_to_main_area(self):
+        pass
+
 
     from modules.controller.action_confirmed import action_confirmed, check_player_resources, check_player_riches, history_note_after_action
     def __init__(self, Ui, Game, x_pos = 480, y_pos = 200, width=480, height=310):
@@ -42,27 +80,13 @@ class Popup:
 
         self.create_popup_widget(x_pos, y_pos, width, height)
         self.add_vertical_layout_to_pupup_widget()
-        self.add_label_for_maintext_to_popup()
+        self.add_label_for_title_to_popup()
 
-        self.create_popup_layout()
-
+        self.add_main_area_to_popup()
+        self.create_card_placeholder() #Left side of main area
+        self.add_right_side_widgets_to_main_area()
         
-        #For test we're adding some widget to simulate card image
-        self.PopupCardWidget = QtWidgets.QWidget()
-        self.PopupCardWidget.setObjectName('CardWidgetTemplate')
-        self.PopupCardWidget.setFixedSize(120, 160)
-        self.PopupCardWidget.setStyleSheet(
-                                    "background-color: #935b89; "
-                                    "border: 1px solid black;"
-                                    "border-radius: 8"
-                                    )
-        self.HorizontalLayout.insertWidget(0, self.PopupCardWidget)
         
-
-        #Prepare Vertical layout for extra text labels. It will be RIGHT SIDE of Horizontal Layout 
-        self.VierticalLayout2 = QtWidgets.QVBoxLayout()
-        self.HorizontalLayout.insertLayout(1, self.VierticalLayout2)
-
         #Add text labels
         self.right_side_widgets_list = list()
         for x in range(0, 11):
@@ -77,10 +101,10 @@ class Popup:
         # self.VierticalLayout2.insertWidget(11, self.right_side_widgets_list[11])
         # self.right_side_widgets_list[11].show()
 
-
         #Additional widget for choosing resources
-        self.right_side_widgets_list.append(QtWidgets.QWidget(self.PopupWidget)) #This widged works weird until parent was added
+        self.right_side_widgets_list.append(QtWidgets.QWidget()) #IF THERE IS A PROBLEM WITH WIDGET THEN TRY ADD self.PopupWidget AS ARGUMENT
         self.VierticalLayout2.insertWidget(11, self.right_side_widgets_list[11])
+
         #Prepare horizontal layout for buttons to manipulater resources
         HorizontalLayout_for_resource_buttons = QtWidgets.QHBoxLayout(self.right_side_widgets_list[11])
         HorizontalLayout_for_resource_buttons.setContentsMargins(5, 5, 165, 5)
@@ -115,7 +139,7 @@ class Popup:
 
         #Prepare horizontal layout for buttons
         self.HorizontalLayout2 = QtWidgets.QHBoxLayout()
-        self.VierticalLayout.addLayout(self.HorizontalLayout2)
+        self.PopupVierticalLayout.addLayout(self.HorizontalLayout2)
         self.HorizontalLayout2.setContentsMargins(0,20,0,0) #left, top, right, bottom
 
         #Add buttons
@@ -201,10 +225,10 @@ class Popup:
             #Quick Note:
             #This works good but i wasn't able to find way of copying widget (only moving this) so instead we generate a new one
             # self.PopupCardWidget = Card
-            # self.HorizontalLayout.insertWidget(0, self.PopupCardWidget
+            # self.PopupMainAreaHorizontalLayout.insertWidget(0, self.PopupCardWidget
 
             #Generate new card
-            self.PopupCardWidget = self.Ui.display_card(Card=self.ClickedCardWidget.Card, Target=self.HorizontalLayout, position_in_layout=0, for_popup=True)
+            self.PopupCardWidget = self.Ui.display_card(Card=self.ClickedCardWidget.Card, Target=self.PopupMainAreaHorizontalLayout, position_in_layout=0, for_popup=True)
             #self.PopupCardWidget.setFixedSize(120, 160)
 
             #Looks like its not needed but i am leaving this line "just in case"
@@ -319,7 +343,7 @@ class Popup:
 
         self.right_side_widgets_list[10].setText('You have not enough resources!')
 
-        maintext={
+        title={
                 "BuyableStore":f"You are buying a Treasure Card",
                 "PlayableStore":f"You are taking a Playable Card<br>Bonus resources: {self.ClickedCardWidget.BelowCardWidget_PlayableStore_Label.text()}",
                 "Harvest":"You are playing Harvesting Card",
@@ -327,7 +351,7 @@ class Popup:
                 "Trade":f"You are playing Trade card ({self.multiplier} times)",
                 "too_much_resources":f"You have too much resources!"
                 }
-        self.MainText.setText(maintext[self.popup_type])
+        self.PopupTitle.setText(title[self.popup_type])
 
 
 

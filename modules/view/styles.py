@@ -17,3 +17,9 @@ popup_styles = (
     )
 
 popup_miantext_styles = "font-size: 18px;  font-weight: 450;"
+
+card_placeholder = (
+    "background-color: #935b89; "
+    "border: 1px solid black;"
+    "border-radius: 8"
+)

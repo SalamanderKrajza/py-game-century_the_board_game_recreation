@@ -219,7 +219,7 @@ def history_note_after_action(self, ClickedCardWidget='none', income=list(), cos
             f'Player gained {display_income}.',
         'Trade': 
             f'has played {c1}Trade]{c2} card {c1}[{self.multiplier} times]{c2}.<br>'
-            f'Player traded {display_income} for {display_cost}',
+            f'Player got {display_income} for {display_cost}',
         'Upgrade': 
             f'has played {c1}[Upgrade]{c2} card.<br>'
             f'Player upgraded {display_cost} to {display_income}',

@@ -131,3 +131,6 @@ dmypy.json
 
 #VSC configuration
 .vsc
+
+#OTHER
+/sandbox/
