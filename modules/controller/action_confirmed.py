@@ -203,7 +203,7 @@ def check_player_riches(self):
     """Before end of the turn we have to check if player have not surpass maximum riches limit"""
     if self.Game.CurrentPlayer.riches_count >= self.Game.riches_maximum:
         print('Game is finished!')
-        self.Ui.game_record(update=True, previous_record = self.Game.record)
+        self.Ui.game_record(update=True, previous_record = self.Ui.record[2])
     pass
 
 #This is also part of the popup class
